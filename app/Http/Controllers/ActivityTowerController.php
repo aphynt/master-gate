@@ -167,6 +167,7 @@ class ActivityTowerController extends Controller
 
         try {
             $consumables = is_array($consumables) ? $consumables : [];
+            // dd($activities);
 
             foreach ($activities as $row) {
                 $activity = ActivityTower::where('UUID', $row['UUID'])->first();
@@ -265,14 +266,13 @@ class ActivityTowerController extends Controller
                 'at.UUID',
                 'lt.UUID as UUID_TOWER',
                 'lt.NAMA as NAMA_TOWER',
-                DB::raw("FORMAT(at.DATE_ACTION, 'yyyy-MM-dd') as DATE_ACTION"),
-                DB::raw("DATE_FORMAT(at.DATE_ACTION, '%Y-%m-%d') as DATE_REPORT"),
+                DB::raw("FORMAT(at.DATE_ACTION, 'yyyy-MM-dd') as DATE_REPORT"),
                 'la.UUID as UUID_ACTIVITY',
                 'la.KETERANGAN as NAMA_ACTIVITY',
                 'at.ACTUAL_PROBLEM',
                 'at.ACTION_PROBLEM',
-                DB::raw("FORMAT(at.START, 'HH:mm') as START"),
-                DB::raw("FORMAT(at.FINISH, 'HH:mm') as FINISH"),
+                DB::raw("CONVERT(VARCHAR(5), at.START, 108) as START"),
+                DB::raw("CONVERT(VARCHAR(5), at.FINISH, 108) as FINISH"),
                 'ls.UUID as UUID_STATUS',
                 'ls.KETERANGAN as NAMA_STATUS',
                 'at.ACTION_BY',
