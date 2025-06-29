@@ -342,6 +342,25 @@
                                                     </button>
                                                 </td>
             `;
+            const lastSelect = tableBody.querySelectorAll('.select2-multiple');
+            let selectedValues = null;
+
+            if (lastSelect.length > 0) {
+                const last = lastSelect[lastSelect.length - 1];
+                selectedValues = $(last).val();
+            }
+
+
+            if (typeof $ !== 'undefined') {
+                $('[data-toggle="select2"]').select2();
+                $('.select2-multiple').select2();
+                $('.clockpicker').clockpicker();
+            }
+
+            if (selectedValues) {
+                const newSelect = newRow.querySelector('.select2-multiple');
+                $(newSelect).val(selectedValues).trigger('change');
+            }
             tableBody.appendChild(newRow);
 
             if (typeof $ !== 'undefined') {

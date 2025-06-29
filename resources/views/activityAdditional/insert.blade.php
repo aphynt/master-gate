@@ -111,7 +111,7 @@
 
         const addRowBtn = document.getElementById('add-row-btn');
         const tableBody = document.getElementById('activity-table');
-        let rowIndex = 1; // start from 1 because 0 already exists
+        let rowIndex = 1;
 
         addRowBtn.addEventListener('click', function (e) {
             e.preventDefault();
@@ -153,9 +153,30 @@
                     </button>
                 </td>
             `;
+
+            const lastSelect = tableBody.querySelectorAll('.select2-multiple');
+            let selectedValues = null;
+
+            if (lastSelect.length > 0) {
+                const last = lastSelect[lastSelect.length - 1];
+                selectedValues = $(last).val();
+            }
+
+
+            if (typeof $ !== 'undefined') {
+                $('[data-toggle="select2"]').select2();
+                $('.select2-multiple').select2();
+                $('.clockpicker').clockpicker();
+            }
+
+            if (selectedValues) {
+                const newSelect = newRow.querySelector('.select2-multiple');
+                $(newSelect).val(selectedValues).trigger('change');
+            }
+
             tableBody.appendChild(newRow);
 
-            // Reinitialize Select2 and Clockpicker
+
             if (typeof $ !== 'undefined') {
                 $('[data-toggle="select2"]').select2();
                 $('.select2-multiple').select2();
@@ -165,13 +186,11 @@
             rowIndex++;
         });
 
-        // SweetAlert2 for remove confirmation
         tableBody.addEventListener('click', function (e) {
             if (e.target.closest('.remove-row')) {
 
                 e.preventDefault();
                 const row = e.target.closest('tr');
-                console.log(row);
 
 
                 Swal.fire({

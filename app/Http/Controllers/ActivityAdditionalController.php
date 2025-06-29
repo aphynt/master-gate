@@ -97,8 +97,8 @@ class ActivityAdditionalController extends Controller
                     'UUID'           => (string) Uuid::uuid4()->toString(),
                     'STATUSENABLED'  => true,
                     'UUID_TEAM'      => $row['TEAM'],
-                    'START'          => $row['START'],
-                    'FINISH'         => $row['FINISH'],
+                    'START'          => normalizeTime($row['START']),
+                    'FINISH'         => normalizeTime($row['FINISH']),
                     'ACTION_PROBLEM' => $row['ACTION_PROBLEM'],
                     'ACTION_BY'      => $actionByString,
                     'REPORTING' => Auth::user()->nrp,
@@ -121,10 +121,10 @@ class ActivityAdditionalController extends Controller
 
         try {
             ActivityAdditional::where('UUID', $uuid)->update([
-                'START' => $request->START,
-                'FINISH' => $request->FINISH,
+                'START'          => normalizeTime($request->START),
+                'FINISH'         => normalizeTime($request->FINISH),
                 'ACTION_PROBLEM' => $request->ACTION_PROBLEM,
-                'UPDATED_AT' => now(),
+                // 'UPDATED_AT' => now(),
             ]);
 
             return redirect()->back()->with('success', 'Data berhasil diupdate.');

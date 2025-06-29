@@ -35,6 +35,7 @@
                                 <th data-priority="1">DATE REPORT</th>
                                 <th data-priority="1">START</th>
                                 <th data-priority="1">FINISH</th>
+                                <th data-priority="1">TEAM</th>
                                 <th data-priority="1">ACTIVITY</th>
                                 <th data-priority="1">PERSONIL</th>
                                 <th data-priority="1">REPORTING</th>
@@ -48,6 +49,7 @@
                                 <td>{{ $act->DATE_REPORT }}</td>
                                 <td>{{ \Carbon\Carbon::parse($act->START)->format('H:i') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($act->FINISH)->format('H:i') }}</td>
+                                <td>{{ $act->NAMA_TEAM }}</td>
                                 <td>{{ $act->ACTION_PROBLEM }}</td>
                                 <td>{{ $act->ACTION_BY }}</td>
                                 <td>{{ $act->REPORTING }}</td>

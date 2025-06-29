@@ -67,8 +67,8 @@ class ActivityGensetController extends Controller
                 'DATE_REPORT'      => $request->DATE_REPORT,
                 'UUID_TOWER'      => $request->UUID_TOWER,
                 'KEGIATAN'      => $request->KEGIATAN,
-                'START'      => $request->START,
-                'FINISH'      => $request->FINISH,
+                'START'          => normalizeTime($request->START),
+                'FINISH'         => normalizeTime($request->FINISH),
                 'FUEL'      => $request->FUEL,
                 'REMARKS'      => $request->REMARKS,
                 'REPORTING' => Auth::user()->nrp,
@@ -116,11 +116,11 @@ class ActivityGensetController extends Controller
         try {
             ActivityGenset::where('UUID', $uuid)->update([
                 'KEGIATAN'      => $request->KEGIATAN,
-                'START'      => $request->START,
-                'FINISH'      => $request->FINISH,
+                'START'          => normalizeTime($request->START),
+                'FINISH'         => normalizeTime($request->FINISH),
                 'FUEL'      => $request->FUEL,
                 'REMARKS'      => $request->REMARKS,
-                'UPDATED_AT' => now(),
+                // 'UPDATED_AT' => now(),
             ]);
 
             return redirect()->route('activityGenset.index')->with('success', 'Data berhasil diupdate.');
