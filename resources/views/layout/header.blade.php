@@ -1,3 +1,19 @@
+<style>
+.shake-alert {
+    display: inline-block;
+    animation: shake 1s infinite;
+    color: #dc3545; /* Merah ala alert */
+}
+
+@keyframes shake {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-3px); }
+    40%  { transform: translateX(3px); }
+    60%  { transform: translateX(-3px); }
+    80%  { transform: translateX(3px); }
+    100% { transform: translateX(0); }
+}
+</style>
 <header class="app-topbar"
     style="background-image: url('{{ asset('dashboard') }}/assets/images/bg-header.png'); background-size: cover; background-repeat: no-repeat; background-position: center;">
 
