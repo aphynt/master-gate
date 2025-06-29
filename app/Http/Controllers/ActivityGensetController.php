@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityGenset;
 use App\Models\ListTower;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,8 +53,9 @@ class ActivityGensetController extends Controller
     public function insert()
     {
         $tower = ListTower::where('STATUSENABLED', true)->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
 
-        return view('activityGenset.insert', compact('tower'));
+        return view('activityGenset.insert', compact('tower', 'user'));
     }
 
     public function post(Request $request)
@@ -72,6 +74,7 @@ class ActivityGensetController extends Controller
                 'FUEL'      => $request->FUEL,
                 'REMARKS'      => $request->REMARKS,
                 'REPORTING' => Auth::user()->nrp,
+                'ACTION_BY' => is_array($request->ACTION_BY) ? implode(',', $request->ACTION_BY) : $request->ACTION_BY,
                 'CREATED_AT' => now(),
                 'UPDATED_AT' => now(),
             ]);
@@ -119,6 +122,7 @@ class ActivityGensetController extends Controller
                 'START'          => normalizeTime($request->START),
                 'FINISH'         => normalizeTime($request->FINISH),
                 'FUEL'      => $request->FUEL,
+                'ACTION_BY' => is_array($request->ACTION_BY) ? implode(',', $request->ACTION_BY) : $request->ACTION_BY,
                 'REMARKS'      => $request->REMARKS,
                 // 'UPDATED_AT' => now(),
             ]);

@@ -227,7 +227,7 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="consumableSelect" class="form-label">Pilih Barang</label>
-                    <select class="form-control" id="consumableSelect">
+                    <select class="form-control" id="consumableSelect" data-toggle="select2">
                         @foreach ($barang as $br)
                             <option value="{{ $br->UUID }}">{{ $br->ITEM }}</option>
                         @endforeach
@@ -309,6 +309,14 @@
                                                         name="data[${rowIndex}][UUID_ACTIVITY]" required>
                                                         @foreach ($activity as $act)
                                                         <option value="{{ $act->UUID }}">{{ $act->KETERANGAN }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" data-toggle="select2"
+                                                        name="data[${rowIndex}][UUID_REQUEST_BY]" required>
+                                                        @foreach ($reqBy as $rby)
+                                                        <option value="{{ $rby->UUID }}">{{ $rby->KETERANGAN }}</option>
                                                         @endforeach
                                                     </select>
                                                 </td>
@@ -558,6 +566,12 @@
         // Update judul modal
         document.getElementById('consumableModalLabel').innerText = `Tambah Consumable untuk ${selectedUnitName}`;
     }
+
+    $('#consumableModal').on('shown.bs.modal', function () {
+        $('#consumableSelect').select2({
+            dropdownParent: $('#consumableModal')
+        });
+    });
 
 
 </script>

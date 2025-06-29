@@ -51,22 +51,33 @@
                                             <option value="TURN OFF">TURN OFF</option>
                                         </select>
                                     </div>
-                                    <div class="form-group clockpicker col-md-4" data-placement="top" data-align="top"
+                                    <div class="form-group clockpicker col-md-3" data-placement="top" data-align="top"
                                         data-autoclose="true">
                                         <label for="exampleSelect1">Start <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" value="09:30" name="START">
                                         {{-- <span class="input-group-text"><i class="mdi mdi-clock-outline"></i></span> --}}
                                     </div>
-                                    <div class="form-group clockpicker col-md-4" data-placement="top" data-align="top"
+                                    <div class="form-group clockpicker col-md-3" data-placement="top" data-align="top"
                                         data-autoclose="true">
                                         <label for="exampleSelect2">Finish <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" value="13:14" name="FINISH">
                                         {{-- <span class="input-group-text"><i class="mdi mdi-clock-outline"></i></span> --}}
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         <label for="input-datepicker">Fuel (%) <span
                                                 class="text-danger">*</span></label>
                                         <input id="input-datepicker" type="number" class="form-control" name="FUEL">
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="input-datepicker">Action by <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control select2-multiple" data-toggle="select2"
+                                                        multiple name="ACTION_BY[]">
+                                                        @foreach ($user as $us)
+                                                        <option value="{{ $us->NRP }}">{{ $us->NAMA_PANGGILAN }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="exampleTextarea">Remarks</label>

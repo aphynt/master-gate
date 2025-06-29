@@ -104,7 +104,7 @@ class ActivityUnitController extends Controller
                     'ACTUAL_PROBLEM' => $act['ACTUAL_PROBLEM'],
                     'ACTION_PROBLEM' => $act['ACTION_PROBLEM'],
                     'START'          => normalizeTime($act['START']),
-                        'FINISH'         => normalizeTime($act['FINISH']),
+                    'FINISH'         => normalizeTime($act['FINISH']),
                     'UUID_STATUS' => $act['STATUS'],
                     'UUID_AREA' => $act['UUID_AREA'],
                     'ACTION_BY' => is_array($act['ACTION_BY']) ? implode(',', $act['ACTION_BY']) : $act['ACTION_BY'],

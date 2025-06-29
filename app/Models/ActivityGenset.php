@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ActivityGenset extends Model
 {
     //
-    protected $table = 'ACTIVITY_ADDITIONAL';
+    protected $table = 'ACTIVITY_GENSET';
 
     protected $guarded = [];
 }
