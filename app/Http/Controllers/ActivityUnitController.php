@@ -82,7 +82,7 @@ class ActivityUnitController extends Controller
         $status = ListStatus::where('STATUSENABLED', true)->get();
         $barang = Barang::where('STATUSENABLED', true)->get();
         $area = ListArea::where('STATUSENABLED', true)->get();
-        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         return view('activityUnit.insert', compact('unit', 'user', 'activity', 'reqBy', 'status', 'barang', 'area'));
     }
@@ -257,7 +257,7 @@ class ActivityUnitController extends Controller
         $actual = ListDescriptionProblem::where('STATUSENABLED', true)->get();
         $status = ListStatus::where('STATUSENABLED', true)->get();
         $barang = Barang::where('STATUSENABLED', true)->get();
-        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         $dailyUnit = DB::table('activity_unit as at')
             ->leftJoin('list_unit as lt', 'at.UUID_UNIT', 'lt.UUID')

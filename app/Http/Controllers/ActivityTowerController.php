@@ -81,7 +81,7 @@ class ActivityTowerController extends Controller
         $actual = ListDescriptionProblem::where('STATUSENABLED', true)->get();
         $status = ListStatus::where('STATUSENABLED', true)->get();
         $barang = Barang::where('STATUSENABLED', true)->get();
-        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         return view('activityTower.insert', compact('tower', 'user', 'activity', 'reqBy', 'actual', 'status', 'barang'));
     }

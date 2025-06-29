@@ -52,7 +52,7 @@ class BarangKeluarController extends Controller
     public function insert()
     {
         $barang = Barang::where('STATUSENABLED', true)->get();
-        $user = User::where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $user = User::where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
         return view('barangKeluar.insert', compact('barang', 'user'));
     }
 
@@ -86,7 +86,7 @@ class BarangKeluarController extends Controller
     {
         $users = DB::table('users')->pluck('name', 'nrp');
         $barang = Barang::where('STATUSENABLED', true)->get();
-        $user = User::where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $user = User::where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         $barangKeluar = DB::table('log_barang_keluar as bk')
         ->leftJoin('log_barang as br', 'bk.UUID_BARANG', 'br.UUID')

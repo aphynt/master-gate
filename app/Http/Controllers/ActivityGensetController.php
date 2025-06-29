@@ -53,7 +53,7 @@ class ActivityGensetController extends Controller
     public function insert()
     {
         $tower = ListTower::where('STATUSENABLED', true)->get();
-        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         return view('activityGenset.insert', compact('tower', 'user'));
     }
