@@ -97,8 +97,11 @@
                 <div class="dropdown">
                     <a class="topbar-link dropdown-toggle drop-arrow-none px-2" data-bs-toggle="dropdown"
                         data-bs-offset="0,25" type="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ asset('dashboard') }}/assets/images/users/avatar-12.png" width="32"
-                            class="rounded-circle me-lg-2 d-flex" alt="user-image">
+                        <img src="{{ asset('avatar') }}/{{ Auth::user()->avatar }}"
+                            width="32" height="32"
+                            style="object-fit: cover"
+                            class="rounded-circle me-lg-2 d-flex"
+                            alt="user-image">
                         <span class="d-lg-flex flex-column gap-1 d-none">
                             <h6 class="my-0" style="color: white">Hi, {{ Auth::user()->name }}</h6>
                         </span>
@@ -111,14 +114,14 @@
                         </div>
 
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <a href="{{ route('profile.index') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-account-outline"></i>
                             <span>Profile</span>
                         </a>
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        {{-- <a href="javascript:void(0);" class="dropdown-item notify-item">
                             <i class="mdi mdi-grease-pencil"></i>
                             <span>Ubah Password</span>
-                        </a>
+                        </a> --}}
 
                         <div class="dropdown-divider"></div>
 

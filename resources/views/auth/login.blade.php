@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ asset('dashboard') }}/assets/images/favicon.png">
+    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}">
 
     <!-- Vendor css -->
     <link href="{{ asset('dashboard') }}/assets/css/vendor.min.css" rel="stylesheet" type="text/css" />

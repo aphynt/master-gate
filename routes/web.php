@@ -20,6 +20,7 @@ use App\Http\Controllers\ListRequestAtController;
 use App\Http\Controllers\ListStatusController;
 use App\Http\Controllers\ListTowerController;
 use App\Http\Controllers\ListUnitController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -137,4 +138,9 @@ Route::group(['middleware' => ['auth']], function(){
     //Activity Harian Unit
     Route::get('/activityHarianUnit', [ActivityHarianUnitController::class, 'index'])->name('activityHarianUnit.index');
     Route::get('/activityHarianUnit/insert', [ActivityHarianUnitController::class, 'insert'])->name('activityHarianUnit.insert');
+
+    //Profile Controller
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile/changeAvatar', [ProfileController::class, 'changeAvatar'])->name('profile.changeAvatar');
+    Route::post('/profile/changePassword', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
 });
