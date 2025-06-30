@@ -66,8 +66,8 @@
                                     <td>{{ $twr->NAMA_ACTIVITY }}</td>
                                     <td>{{ $twr->ACTUAL_PROBLEM }}</td>
                                     <td>{{ $twr->ACTION_PROBLEM }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($twr->START)->format('H:i') }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($twr->FINISH)->format('H:i') }}</td>
+                                    <td>{{ date('H:i', strtotime($twr->START)) }}</td>
+                                    <td>{{ date('H:i', strtotime($twr->FINISH)) }}</td>
                                     <td>{{ $twr->NAMA_STATUS }}</td>
                                     <td>{{ $twr->ACTION_BY }}</td>
                                     <td>{{ $twr->REMARKS }}</td>
