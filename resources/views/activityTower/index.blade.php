@@ -57,7 +57,9 @@
                                 @foreach ($tower as $twr)
                                 <tr>
                                     <td>
+                                        @if (Auth::user()->nrp == $twr->NRP_REPORTING)
                                         <input type="checkbox" name="selected_items[]" value="{{ $twr->UUID }}" style="cursor: pointer;">
+                                        @endif
                                     </td>
                                     <td>{{ $twr->NAMA_TOWER }}</td>
                                     <td>{{ $twr->DATE_ACTION }}</td>

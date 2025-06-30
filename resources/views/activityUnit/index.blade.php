@@ -57,7 +57,9 @@
                                 @foreach ($unit as $unt)
                                 <tr>
                                     <td>
+                                        @if (Auth::user()->nrp == $unt->NRP_REPORTING)
                                         <input type="checkbox" name="selected_items[]" value="{{ $unt->UUID }}" style="cursor: pointer;">
+                                        @endif
                                     </td>
                                     <td>{{ $unt->NAMA_UNIT }}</td>
                                     <td>{{ $unt->DATE_ACTION }}</td>
