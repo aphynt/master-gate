@@ -13,9 +13,10 @@ class MaintenanceUnitController extends Controller
     //
     public function index()
     {
-        $bulanTahun = $request->DATE_REPORT ?? Carbon::now()->format('Y-m');
+        // Ambil bulan & tahun dari request atau default ke bulan ini
+        $bulanTahun = request('DATE_REPORT') ?? Carbon::now()->format('Y-m');
 
-        // Ambil aktivitas maintenance terbaru per unit
+        // Subquery: Ambil aktivitas terakhir per unit untuk bulan dan act.ID = 2
         $latestActivity = DB::table(DB::raw("
             (
                 SELECT
@@ -25,18 +26,22 @@ class MaintenanceUnitController extends Controller
                     au.UUID_AREA,
                     au.REMARKS,
                     au.REPORTING,
-                    ROW_NUMBER() OVER (PARTITION BY au.UUID_UNIT ORDER BY au.DATE_ACTION DESC, au.UUID DESC) as rn
+                    ROW_NUMBER() OVER (
+                        PARTITION BY au.UUID_UNIT
+                        ORDER BY au.DATE_ACTION DESC, au.UUID DESC
+                    ) as rn
                 FROM ACTIVITY_UNIT au
                 JOIN LIST_ACTIVITY act ON au.UUID_ACTIVITY = act.UUID
-                WHERE au.STATUSENABLED = 1
-                AND act.ID = 2
-                AND FORMAT(au.DATE_ACTION, 'yyyy-MM') = ?
+                WHERE
+                    au.STATUSENABLED = 1
+                    AND act.ID = 2
+                    AND FORMAT(au.DATE_ACTION, 'yyyy-MM') = ?
             ) as ranked
         "))
-        ->addBinding([$bulanTahun]) // untuk parameter FORMAT()
+        ->addBinding([$bulanTahun])
         ->where('rn', 1);
 
-        // Gabungkan dengan list unit
+        // Main query: Ambil seluruh unit, dan gabungkan dengan aktivitas maintenance bulan tersebut (jika ada)
         $activityUnit = DB::table('LIST_UNIT as lu')
             ->leftJoinSub($latestActivity, 'latest', function ($join) {
                 $join->on('lu.UUID', '=', 'latest.UUID_UNIT');
@@ -46,7 +51,10 @@ class MaintenanceUnitController extends Controller
             ->select(
                 'lu.VHC_ID as NAME',
                 'lu.GROUP_ID as CODE',
-                DB::raw("CASE WHEN latest.UUID IS NOT NULL THEN 'Already Maintained' ELSE 'Ready For Maintenance' END as STATUS"),
+                DB::raw("CASE
+                    WHEN latest.UUID IS NOT NULL THEN 'Already Maintained'
+                    ELSE 'Ready For Maintenance'
+                END as STATUS"),
                 'latest.DATE_ACTION as LAST_MAINTAINED',
                 'la.KETERANGAN as LOCATION',
                 'latest.REMARKS',
