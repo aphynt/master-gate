@@ -101,9 +101,9 @@
 
             <li class="side-nav-title">Activity</li>
             <li class="side-nav-item">
-                <a href="#" onclick="Swal.fire({ icon: 'info', title: 'Upps!', text: 'Maaf, menu ini belum berfungsi.', confirmButtonText: 'OK' })" class="side-nav-link">
+                <a href="{{ route('dailyActivity.index') }}" class="side-nav-link">
                     <span class="menu-icon"><img src="{{ asset('dashboard') }}/assets/images/sidebar/interpretation.png" style="width: 20px"></i></span>
-                    <span class="menu-text"> Summary </span>
+                    <span class="menu-text"> Daily </span>
                 </a>
             </li>
             <li class="side-nav-item">

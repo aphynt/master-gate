@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
+use App\Http\Controllers\DailyActivityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ListAccessPointController;
 use App\Http\Controllers\ListActionProblemController;
@@ -99,6 +100,9 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/inventory/outgoing/delete/{uuid}', [BarangKeluarController::class, 'delete'])->name('barangKeluar.delete');
     Route::get('/inventory/outgoing/edit/{uuid}', [BarangKeluarController::class, 'edit'])->name('barangKeluar.edit');
     Route::post('/inventory/outgoing/update/{uuid}', [BarangKeluarController::class, 'update'])->name('barangKeluar.update');
+
+    //Daily Activity
+    Route::get('/dailyActivity', [DailyActivityController::class, 'index'])->name('dailyActivity.index');
 
     //Activity Tower
     Route::get('/activityTower', [ActivityTowerController::class, 'index'])->name('activityTower.index');
