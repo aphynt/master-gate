@@ -21,6 +21,7 @@ use App\Http\Controllers\ListRequestAtController;
 use App\Http\Controllers\ListStatusController;
 use App\Http\Controllers\ListTowerController;
 use App\Http\Controllers\ListUnitController;
+use App\Http\Controllers\MaintenanceUnitController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -103,6 +104,9 @@ Route::group(['middleware' => ['auth']], function(){
 
     //Daily Activity
     Route::get('/dailyActivity', [DailyActivityController::class, 'index'])->name('dailyActivity.index');
+
+    //Maintenance Unit
+    Route::get('/maintenanceUnit', [MaintenanceUnitController::class, 'index'])->name('maintenanceUnit.index');
 
     //Activity Tower
     Route::get('/activityTower', [ActivityTowerController::class, 'index'])->name('activityTower.index');

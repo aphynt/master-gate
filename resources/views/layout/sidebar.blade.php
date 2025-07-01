@@ -98,13 +98,39 @@
                 </div>
             </li>
 
-
             <li class="side-nav-title">Activity</li>
-            <li class="side-nav-item">
-                <a href="{{ route('dailyActivity.index') }}" class="side-nav-link">
-                    <span class="menu-icon"><img src="{{ asset('dashboard') }}/assets/images/sidebar/interpretation.png" style="width: 20px"></i></span>
-                    <span class="menu-text"> Daily </span>
+
+             <li class="side-nav-item">
+                <a data-bs-toggle="collapse" href="#summaryReport" aria-expanded="false"
+                    aria-controls="summaryReport" class="side-nav-link">
+                    <span class="menu-icon"><img src="{{ asset('dashboard') }}/assets/images/sidebar/interpretation.png" style="width: 20px"></span>
+                    <span class="menu-text"> Report </span>
+                    <span class="menu-arrow"></span>
                 </a>
+                <div class="collapse" id="summaryReport">
+                    <ul class="sub-menu">
+                        <li class="side-nav-item">
+                            <a href="{{ route('dailyActivity.index') }}" class="side-nav-link">
+                                <span class="menu-text">Summary Daily</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="#" onclick="Swal.fire({ icon: 'info', title: 'Upps!', text: 'Maaf, menu ini belum berfungsi.', confirmButtonText: 'OK' })" class="side-nav-link">
+                                <span class="menu-text">Summary Monthly</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="#" onclick="Swal.fire({ icon: 'info', title: 'Upps!', text: 'Maaf, menu ini belum berfungsi.', confirmButtonText: 'OK' })" class="side-nav-link">
+                                <span class="menu-text">Maintenance Tower</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="{{ route('maintenanceUnit.index') }}" class="side-nav-link">
+                                <span class="menu-text">Maintenance Unit</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <li class="side-nav-item">
                 <a href="{{ route('activityTower.index') }}" class="side-nav-link">

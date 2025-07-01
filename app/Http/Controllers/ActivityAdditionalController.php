@@ -24,12 +24,15 @@ class ActivityAdditionalController extends Controller
 
         $users = DB::table('users')->pluck('name', 'nrp');
 
+        $team = ListTeam::where('STATUSENABLED', true)->get();
+
         $activity = DB::table('activity_additional as add')
             ->leftJoin('list_team as team', 'add.UUID_TEAM', 'team.UUID')
             ->leftJoin('users as us', 'add.REPORTING', 'us.nrp')
             ->select(
                 'add.UUID',
                 'add.STATUSENABLED',
+                'team.UUID as UUID_TEAM',
                 'team.NAMA as NAMA_TEAM',
                 'add.START',
                 'add.FINISH',
@@ -58,7 +61,7 @@ class ActivityAdditionalController extends Controller
             $act->ACTION_BY = implode(', ', $names);
         }
 
-        return view('activityAdditional.index', compact('activity'));
+        return view('activityAdditional.index', compact('activity', 'team'));
     }
 
     public function insert()
@@ -121,6 +124,7 @@ class ActivityAdditionalController extends Controller
 
         try {
             ActivityAdditional::where('UUID', $uuid)->update([
+                'UUID_TEAM' => $request->TEAM,
                 'START'          => normalizeTime($request->START),
                 'FINISH'         => normalizeTime($request->FINISH),
                 'ACTION_PROBLEM' => $request->ACTION_PROBLEM,
