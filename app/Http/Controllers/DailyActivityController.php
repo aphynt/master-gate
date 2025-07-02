@@ -60,13 +60,14 @@ class DailyActivityController extends Controller
 
         // --- Ambil data Tower ---
         $tower = DB::table('activity_tower as at')
+            ->leftJoin('LIST_TOWER as lt', 'at.UUID_TOWER', 'lt.UUID')
             ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
             ->select(
                 'at.UUID',
                 'at.STATUSENABLED',
                 'at.START',
                 'at.FINISH',
-                DB::raw("CONCAT(at.ACTION_PROBLEM, ' (', at.ACTUAL_PROBLEM, ')') as ACTIVITY"),
+                DB::raw("CONCAT('(', lt.NAMA, ') ', at.ACTION_PROBLEM, ' (', at.ACTUAL_PROBLEM, ')') as ACTIVITY"),
                 'at.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'at.DATE_ACTION as DATE_REPORT',
@@ -82,13 +83,14 @@ class DailyActivityController extends Controller
 
         // --- Ambil data Unit ---
         $unit = DB::table('ACTIVITY_UNIT as un')
+            ->leftJoin('LIST_UNIT as lu', 'un.UUID_UNIT', 'lu.UUID')
             ->leftJoin('users as us', 'un.REPORTING', 'us.nrp')
             ->select(
                 'un.UUID',
                 'un.STATUSENABLED',
                 'un.START',
                 'un.FINISH',
-                DB::raw("CONCAT(un.ACTION_PROBLEM, ' (', un.ACTUAL_PROBLEM, ')') as ACTIVITY"),
+                DB::raw("CONCAT('(', lu.VHC_ID, ') ', un.ACTION_PROBLEM, ' (', un.ACTUAL_PROBLEM, ')') as ACTIVITY"),
                 'un.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'un.DATE_ACTION as DATE_REPORT',

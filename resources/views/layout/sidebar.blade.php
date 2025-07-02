@@ -120,7 +120,7 @@
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="#" onclick="Swal.fire({ icon: 'info', title: 'Upps!', text: 'Maaf, menu ini belum berfungsi.', confirmButtonText: 'OK' })" class="side-nav-link">
+                            <a href="{{ route('maintenanceTower.index') }}" class="side-nav-link">
                                 <span class="menu-text">Maintenance Tower</span>
                             </a>
                         </li>

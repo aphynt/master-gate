@@ -21,7 +21,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body pt-2">
-                    <table id="datatable" class="table table-bordered dt-responsive nowrap"
+                    <table id="datatable" class="table table-bordered"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
@@ -41,7 +41,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $brm->NAMA_BARANG }}</td>
                                 <td>{{ \Carbon\Carbon::parse($brm->TANGGAL_KELUAR)->format('Y-m-d') }}</td>
-                                <td>{{ $brm->JUMLAH }}</td>
+                                <td style="text-align: center">{{ $brm->JUMLAH }}</td>
                                 <td>{{ $brm->PIC }}</td>
                                 <td>{{ $brm->KETERANGAN }}</td>
                                 <td>{{ $brm->NAMA_REPORTING }}</td>
@@ -50,7 +50,7 @@
 
                                         <a href="{{ route('barangKeluar.edit', $brm->UUID) }}" class="btn btn-purple waves-effect waves-light btn-sm">Edit</a>
 
-                                        <a href="#deletebarangKeluar{{ $brm->UUID }}"
+                                        <a href="#deleteBarangKeluar{{ $brm->UUID }}"
                                             class="btn btn-danger waves-effect waves-light btn-sm" data-animation="contentscale"
                                             data-plugin="custommodal" data-overlaySpeed="100"
                                             data-overlayColor="#36404a">Hapus</a>
@@ -69,3 +69,15 @@
 </div>
 
 @include('layout.footer')
+<script>
+    $(document).ready(function () {
+        if ($.fn.DataTable.isDataTable('#datatable')) {
+            $('#datatable').DataTable().destroy();
+        }
+
+        $('#datatable').DataTable({
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, 100, 200], [10, 25, 50, 100, 200]],
+        });
+    });
+</script>

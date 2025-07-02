@@ -1,4 +1,4 @@
-@include('layout.head', ['title' => 'Maintenance Unit'])
+@include('layout.head', ['title' => 'Maintenance Tower'])
 @include('layout.sidebar')
 @include('layout.header')
 <div class="page-container">
@@ -6,7 +6,7 @@
     <div class="page-title-box">
         <div class="d-flex align-items-center flex-wrap gap-2">
             <div class="flex-grow-1">
-                <h4 class="font-18 mb-0">Maintenance Unit</h4>
+                <h4 class="font-18 mb-0">Maintenance Tower</h4>
             </div>
 
            <form action="" method="GET" class="d-flex align-items-center gap-2">
@@ -31,7 +31,7 @@
 
                         $tanggal = request('DATE_REPORT') ?? Carbon::today()->format('Y-m-d');
 
-                        $grouped = collect($activityUnit)->groupBy(function ($item) {
+                        $grouped = collect($activityTower)->groupBy(function ($item) {
                             return substr($item->NAME, 0, 2);
                         });
 
@@ -55,25 +55,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($grouped as $code => $units)
+                                @foreach ($grouped as $code => $towers)
                                     {{-- <tr class="table-secondary">
                                         <td colspan="8"><strong>Group: {{ $code }}</strong></td>
                                     </tr> --}}
-                                    @foreach ($units as $unit)
+                                    @foreach ($towers as $tower)
                                         <tr>
                                             <td>{{ $no++ }}</td>
-                                            <td>{{ $unit->NAME }}</td>
-                                            <td>{{ $unit->CODE }}</td>
-                                            <td>@if ($unit->STATUS == 'Ready For Maintenance')
-                                                    <span class="badge badge-outline-danger">{{ $unit->STATUS }}</span>
+                                            <td>{{ $tower->NAME }}</td>
+                                            <td>{{ $tower->CODE }}</td>
+                                            <td>@if ($tower->STATUS == 'Ready For Maintenance')
+                                                    <span class="badge badge-outline-danger">{{ $tower->STATUS }}</span>
                                                 @else
-                                                    <span class="badge badge-outline-success">{{ $unit->STATUS }}</span>
+                                                    <span class="badge badge-outline-success">{{ $tower->STATUS }}</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $unit->LAST_MAINTAINED ? \Carbon\Carbon::parse($unit->LAST_MAINTAINED)->translatedFormat('F d, Y') : '' }}</td>
-                                            <td>{{ $unit->LOCATION }}</td>
-                                            <td>{{ $unit->REMARKS }}</td>
-                                            <td>{{ $unit->REPORTING }}</td>
+                                            <td>{{ $tower->LAST_MAINTAINED ? \Carbon\Carbon::parse($tower->LAST_MAINTAINED)->translatedFormat('F d, Y') : '' }}</td>
+                                            <td>{{ $tower->LOCATION }}</td>
+                                            <td>{{ $tower->REMARKS }}</td>
+                                            <td>{{ $tower->REPORTING }}</td>
                                         </tr>
                                     @endforeach
                                 @endforeach

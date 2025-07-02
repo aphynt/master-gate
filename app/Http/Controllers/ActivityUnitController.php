@@ -93,6 +93,9 @@ class ActivityUnitController extends Controller
         $consumables = json_decode($request->input('CONSUMABLE'), true);
 
         try {
+            // Menyimpan unit yang sudah diproses untuk consumable
+            $unitConsumableDone = [];
+
             foreach ($activities as $act) {
                 $activity = ActivityUnit::create([
                     'UUID' => $act['UUID'],
@@ -103,8 +106,8 @@ class ActivityUnitController extends Controller
                     'UUID_ACTIVITY' => $act['UUID_ACTIVITY'],
                     'ACTUAL_PROBLEM' => $act['ACTUAL_PROBLEM'],
                     'ACTION_PROBLEM' => $act['ACTION_PROBLEM'],
-                    'START'          => normalizeTime($act['START']),
-                    'FINISH'         => normalizeTime($act['FINISH']),
+                    'START' => normalizeTime($act['START']),
+                    'FINISH' => normalizeTime($act['FINISH']),
                     'UUID_STATUS' => $act['STATUS'],
                     'UUID_AREA' => $act['UUID_AREA'],
                     'ACTION_BY' => is_array($act['ACTION_BY']) ? implode(',', $act['ACTION_BY']) : $act['ACTION_BY'],
@@ -113,8 +116,11 @@ class ActivityUnitController extends Controller
                     'ADD_BY' => Auth::user()->nrp,
                 ]);
 
-                foreach ($consumables ?? [] as $cons) {
-                    if ($cons['unitUUID'] == $act['UUID_UNIT']) {
+                // Hanya simpan consumable jika unit belum diproses
+                if (!in_array($act['UUID_UNIT'], $unitConsumableDone)) {
+                    $filteredConsumables = array_filter($consumables ?? [], fn($cons) => $cons['unitUUID'] == $act['UUID_UNIT']);
+
+                    foreach ($filteredConsumables as $cons) {
                         BarangKeluar::create([
                             'UUID' => (string) Uuid::uuid4()->toString(),
                             'STATUSENABLED' => true,
@@ -128,6 +134,9 @@ class ActivityUnitController extends Controller
                             'ADD_BY' => Auth::user()->nrp,
                         ]);
                     }
+
+                    // Tandai unit sudah diproses
+                    $unitConsumableDone[] = $act['UUID_UNIT'];
                 }
             }
 
@@ -135,6 +144,7 @@ class ActivityUnitController extends Controller
         } catch (\Throwable $th) {
             return redirect()->back()->with('info', 'Terjadi kesalahan: '. $th->getMessage());
         }
+
 
     }
 

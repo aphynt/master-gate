@@ -93,6 +93,9 @@ class ActivityTowerController extends Controller
         $consumables = json_decode($request->input('CONSUMABLE'), true);
 
         try {
+            // Menyimpan tower yang sudah diberi consumable
+            $towerConsumableDone = [];
+
             foreach ($activities as $act) {
                 $activity = ActivityTower::create([
                     'UUID' => $act['UUID'],
@@ -102,8 +105,8 @@ class ActivityTowerController extends Controller
                     'UUID_ACTIVITY' => $act['UUID_ACTIVITY'],
                     'ACTUAL_PROBLEM' => $act['ACTUAL_PROBLEM'],
                     'ACTION_PROBLEM' => $act['ACTION_PROBLEM'],
-                    'START'          => normalizeTime($act['START']),
-                    'FINISH'         => normalizeTime($act['FINISH']),
+                    'START' => normalizeTime($act['START']),
+                    'FINISH' => normalizeTime($act['FINISH']),
                     'UUID_STATUS' => $act['STATUS'],
                     'ACTION_BY' => is_array($act['ACTION_BY']) ? implode(',', $act['ACTION_BY']) : $act['ACTION_BY'],
                     'REMARKS' => $act['REMARKS'],
@@ -111,28 +114,35 @@ class ActivityTowerController extends Controller
                     'ADD_BY' => Auth::user()->nrp,
                 ]);
 
-                foreach ($consumables ?? [] as $cons) {
-                    if ($cons['towerUUID'] == $act['UUID_TOWER']) {
+                // Cek apakah tower ini sudah diproses untuk barang keluar
+                if (!in_array($act['UUID_TOWER'], $towerConsumableDone)) {
+                    $filteredConsumables = array_filter($consumables, fn($csm) => $csm['towerUUID'] === $act['UUID_TOWER']);
+
+                    foreach ($filteredConsumables as $csm) {
                         BarangKeluar::create([
                             'UUID' => (string) Uuid::uuid4()->toString(),
                             'STATUSENABLED' => true,
-                            'UUID_BARANG' => $cons['uuid'],
+                            'UUID_BARANG' => $csm['uuid'],
                             'TANGGAL_KELUAR' => $request->DATE_REPORT,
-                            'JUMLAH' => $cons['qty'],
+                            'JUMLAH' => $csm['qty'],
                             'PIC' => is_array($act['ACTION_BY']) ? implode(',', $act['ACTION_BY']) : $act['ACTION_BY'],
-                            'UUID_ACTIVITY_TOWER' => $activity->UUID,
+                            'UUID_ACTIVITY_TOWER' => $activity->UUID, // hubungkan ke activity pertama tower ini
                             'KETERANGAN' => $act['REMARKS'],
                             'REPORTING' => Auth::user()->nrp,
                             'ADD_BY' => Auth::user()->nrp,
                         ]);
                     }
+
+                    // Tandai tower sudah diproses
+                    $towerConsumableDone[] = $act['UUID_TOWER'];
                 }
             }
 
             return redirect()->route('activityTower.index')->with('success', 'Semua activity tower berhasil ditambahkan.');
         } catch (\Throwable $th) {
-            return redirect()->back()->with('info', 'Terjadi kesalahan: '. $th->getMessage());
+            return redirect()->back()->with('info', 'Terjadi kesalahan: ' . $th->getMessage());
         }
+
 
     }
 
