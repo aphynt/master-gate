@@ -262,7 +262,7 @@
     </div>
 </div>
 
-
+@include('layout.footer')
 <script>
 
 
@@ -577,4 +577,4 @@
 </script>
 
 
-@include('layout.footer')
+
