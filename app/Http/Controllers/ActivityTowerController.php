@@ -119,6 +119,9 @@ class ActivityTowerController extends Controller
                     $filteredConsumables = array_filter($consumables, fn($csm) => $csm['towerUUID'] === $act['UUID_TOWER']);
 
                     foreach ($filteredConsumables as $csm) {
+                        if (!is_array($csm)) {
+                            continue;
+                        }
                         BarangKeluar::create([
                             'UUID' => (string) Uuid::uuid4()->toString(),
                             'STATUSENABLED' => true,

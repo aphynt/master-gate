@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityAdditionalController;
 use App\Http\Controllers\ActivityGensetController;
 use App\Http\Controllers\ActivityHarianTowerController;
 use App\Http\Controllers\ActivityHarianUnitController;
+use App\Http\Controllers\ActivityPergantianBarangController;
 use App\Http\Controllers\ActivityTowerController;
 use App\Http\Controllers\ActivityUnitController;
 use App\Http\Controllers\AuthController;
@@ -142,6 +143,14 @@ Route::group(['middleware' => ['auth']], function(){
     Route::post('/activityAdditional/post', [ActivityAdditionalController::class, 'post'])->name('activityAdditional.post');
     Route::post('/activityAdditional/update/{uuid}', [ActivityAdditionalController::class, 'update'])->name('activityAdditional.update');
     Route::get('/activityAdditional/delete/{uuid}', [ActivityAdditionalController::class, 'delete'])->name('activityAdditional.delete');
+
+     //Activity Pergantian Barang
+    Route::get('/activityPergantianBarang', [ActivityPergantianBarangController::class, 'index'])->name('activityPergantianBarang.index');
+    Route::get('/activityPergantianBarang/insert', [ActivityPergantianBarangController::class, 'insert'])->name('activityPergantianBarang.insert');
+    Route::post('/activityPergantianBarang/post', [ActivityPergantianBarangController::class, 'post'])->name('activityPergantianBarang.post');
+    Route::get('/activityPergantianBarang/edit/{uuid}', [ActivityPergantianBarangController::class, 'edit'])->name('activityPergantianBarang.edit');
+    Route::post('/activityPergantianBarang/update/{uuid}', [ActivityPergantianBarangController::class, 'update'])->name('activityPergantianBarang.update');
+    Route::get('/activityPergantianBarang/delete/{uuid}', [ActivityPergantianBarangController::class, 'delete'])->name('activityPergantianBarang.delete');
 
     //Activity Harian Tower
     Route::get('/activityHarianTower', [ActivityHarianTowerController::class, 'index'])->name('activityHarianTower.index');

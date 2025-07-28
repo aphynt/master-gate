@@ -10444,6 +10444,10 @@ fieldset:disabled .btn {
     padding-top: 3rem !important
 }
 
+.pt-10 {
+    padding-top: 15rem !important
+}
+
 .pe-0 {
     padding-right: 0 !important
 }

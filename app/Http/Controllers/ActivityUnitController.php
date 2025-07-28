@@ -121,6 +121,9 @@ class ActivityUnitController extends Controller
                     $filteredConsumables = array_filter($consumables ?? [], fn($cons) => $cons['unitUUID'] == $act['UUID_UNIT']);
 
                     foreach ($filteredConsumables as $cons) {
+                        if (!is_array($cons)) {
+                            continue;
+                        }
                         BarangKeluar::create([
                             'UUID' => (string) Uuid::uuid4()->toString(),
                             'STATUSENABLED' => true,

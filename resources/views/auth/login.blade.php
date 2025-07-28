@@ -63,7 +63,7 @@
     overflow: hidden;
 ">
     @include('notification.sweet')
-    <div class="account-pages pt-5 my-5">
+    <div class="account-pages pt-10 my-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6 col-xl-5" style="--bs-box-shadow:  0px 0px 0px 0 #dadee8">
