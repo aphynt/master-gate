@@ -11,15 +11,16 @@
 
             <form action="" method="GET" class="d-flex align-items-center gap-2">
                 <input type="text" id="basic-datepicker" class="form-control" name="DATE_REPORT" required
-                    style="width: 160px;">
-                <button type="submit" class="btn btn-outline-primary">Show Report</button>
-            </form>
+                    style="width: 160px;" value="{{ request('DATE_REPORT') }}">
 
-            {{-- <div>
-                <a href="#" class="btn btn-primary waves-effect waves-light">
+                <button type="submit" name="action_type" value="show" class="btn btn-outline-primary">
+                    Show Report
+                </button>
+
+                <button type="submit" name="action_type" value="export" class="btn btn-primary waves-effect waves-light">
                     Export Excel
-                </a>
-            </div> --}}
+                </button>
+            </form>
         </div>
     </div>
 

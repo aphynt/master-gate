@@ -6,6 +6,8 @@ use App\Models\ActivityAdditional;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SummaryDailyExport;
 
 class DailyActivityController extends Controller
 {
@@ -17,10 +19,10 @@ class DailyActivityController extends Controller
         }else{
             $date = Carbon::today()->format('Y-m-d');
         }
+        $action = $request->input('action_type');
 
         $users = DB::table('users')->pluck('name', 'nrp');
 
-        // Fungsi bantu untuk konversi PIC
         $convertPIC = function ($picString) use ($users) {
             $nrps = explode(',', $picString);
             $names = [];
@@ -35,7 +37,6 @@ class DailyActivityController extends Controller
             return implode(', ', $names);
         };
 
-        // --- Ambil data Additional ---
         $additional = DB::table('ACTIVITY_ADDITIONAL as add')
             ->leftJoin('LIST_TEAM as team', 'add.UUID_TEAM', 'team.UUID')
             ->leftJoin('users as us', 'add.REPORTING', 'us.nrp')
@@ -123,8 +124,21 @@ class DailyActivityController extends Controller
             ->where('gen.DATE_REPORT', $date)
             ->get();
 
-        // --- Gabungkan semua ---
+        $teamOrder = ['All Team', 'Network', 'Hardware'];
+
         $dailyActivity = collect()
+            ->merge($additional)
+            ->merge($tower)
+            ->merge($unit)
+            ->merge($genset)
+            ->sortBy(function ($item) use ($teamOrder) {
+                $teamIndex = array_search($item->TEAM, $teamOrder);
+                $teamIndex = $teamIndex === false ? PHP_INT_MAX : $teamIndex;
+                return sprintf('%03d-%s', $teamIndex, $item->START);
+            })
+            ->values();
+
+        $historyRepair = collect()
             ->merge($additional)
             ->merge($tower)
             ->merge($unit)
@@ -132,10 +146,133 @@ class DailyActivityController extends Controller
             ->sortBy('START')
             ->values();
 
-        $data = [
-            'dailyActivity' => $dailyActivity,
-        ];
+        $bulanTahun = request('DATE_REPORT') ?? Carbon::now()->format('Y-m');
+            $tanggalSekarang = request('DAY') ?? now()->day;
 
-        return view('dailyActivity.index', compact('data'));
+            $carbonBulan = Carbon::parse($bulanTahun)->startOfMonth();
+
+            // Tentukan periode MT berdasarkan tanggal hari ini
+            if ($tanggalSekarang < 16) {
+                // Periode 1
+                $mtStart = $carbonBulan->copy()->startOfMonth()->toDateString();
+                $mtEnd = $carbonBulan->copy()->day(15)->toDateString();
+            } else {
+                // Periode 2
+                $mtStart = $carbonBulan->copy()->day(16)->toDateString();
+                $mtEnd = $carbonBulan->copy()->endOfMonth()->toDateString();
+            }
+
+            // Untuk unit selain MT → tetap dari awal sampai akhir bulan
+            $nonMtStart = $carbonBulan->copy()->startOfMonth()->toDateString();
+            $nonMtEnd = $carbonBulan->copy()->endOfMonth()->toDateString();
+
+
+        $latestActivityTower = DB::table(DB::raw("
+                (
+                    SELECT
+                        au.UUID_TOWER,
+                        au.UUID,
+                        au.DATE_ACTION,
+                        au.REMARKS,
+                        au.REPORTING,
+                        lu.TYPE,
+                        au.START,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY au.UUID_TOWER
+                            ORDER BY au.DATE_ACTION DESC, au.UUID DESC
+                        ) as rn
+                    FROM ACTIVITY_TOWER au
+                    JOIN LIST_ACTIVITY act ON au.UUID_ACTIVITY = act.UUID
+                    JOIN LIST_TOWER lu ON au.UUID_TOWER = lu.UUID
+                    WHERE
+                        au.STATUSENABLED = 1
+                        AND act.ID = 2
+                        AND (
+                            (lu.TYPE = 'MT' AND au.DATE_ACTION BETWEEN ? AND ?)
+                            OR
+                            (lu.TYPE != 'MT' AND au.DATE_ACTION BETWEEN ? AND ?)
+                        )
+                ) as ranked
+            "))
+            ->addBinding([$mtStart, $mtEnd, $nonMtStart, $nonMtEnd])
+            ->where('rn', 1);
+
+        $maintenanceTower = DB::table('LIST_TOWER as lu')
+                ->leftJoinSub($latestActivityTower, 'latest', function ($join) {
+                    $join->on('lu.UUID', '=', 'latest.UUID_TOWER');
+                })
+                ->leftJoin('users as us', 'latest.REPORTING', '=', 'us.nrp')
+                ->select(
+                    'lu.NAMA as NAME',
+                    'lu.TYPE as CODE',
+                    DB::raw("CASE
+                        WHEN latest.UUID IS NOT NULL THEN 'Already Maintained'
+                        ELSE 'Ready For Maintenance'
+                    END as STATUS"),
+                    DB::raw("FORMAT(CAST(latest.DATE_ACTION AS DATETIME) + CAST(latest.START AS DATETIME), 'yyyy-MM-dd HH:mm') as LAST_MAINTAINED"),
+                    'lu.LOKASI as LOCATION',
+                    'latest.REMARKS',
+                    'us.name as REPORTING'
+                )
+                ->where('lu.STATUSENABLED', true)
+                ->orderBy('lu.NAMA')
+                ->get();
+        $latestActivityUnit = DB::table(DB::raw("
+            (
+                SELECT
+                    au.UUID_UNIT,
+                    au.UUID,
+                    au.DATE_ACTION,
+                    au.UUID_AREA,
+                    au.REMARKS,
+                    au.REPORTING,
+                    au.START,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY au.UUID_UNIT
+                        ORDER BY au.DATE_ACTION DESC, au.UUID DESC
+                    ) as rn
+                FROM ACTIVITY_UNIT au
+                JOIN LIST_ACTIVITY act ON au.UUID_ACTIVITY = act.UUID
+                WHERE
+                    au.STATUSENABLED = 1
+                    AND act.ID = 2
+                    AND FORMAT(au.DATE_ACTION, 'yyyy-MM') = ?
+            ) as ranked
+        "))
+        ->addBinding([$bulanTahun])
+        ->where('rn', 1);
+
+        $maintenanceUnit = DB::table('LIST_UNIT as lu')
+            ->leftJoinSub($latestActivityUnit, 'latest', function ($join) {
+                $join->on('lu.UUID', '=', 'latest.UUID_UNIT');
+            })
+            ->leftJoin('LIST_AREA as la', 'latest.UUID_AREA', '=', 'la.UUID')
+            ->leftJoin('users as us', 'latest.REPORTING', '=', 'us.nrp')
+            ->select(
+                'lu.VHC_ID as NAME',
+                'lu.GROUP_ID as CODE',
+                DB::raw("CASE
+                    WHEN latest.UUID IS NOT NULL THEN 'Already Maintained'
+                    ELSE 'Ready For Maintenance'
+                END as STATUS"),
+                DB::raw("FORMAT(CAST(latest.DATE_ACTION AS DATETIME) + CAST(latest.START AS DATETIME), 'yyyy-MM-dd HH:mm') as LAST_MAINTAINED"),
+                'la.KETERANGAN as LOCATION',
+                'latest.REMARKS',
+                'us.name as REPORTING'
+            )
+            ->where('lu.STATUSENABLED', true)
+            ->orderBy('lu.VHC_ID')
+            ->get();
+
+        if ($action === 'export') {
+            return Excel::download(new SummaryDailyExport($dailyActivity, $historyRepair, $maintenanceTower, $maintenanceUnit, $date), 'Summary Activity ' . Carbon::parse($request->DATE_REPORT)->translatedFormat('d F Y') . '.xlsx');
+        }
+
+        // Jika hanya tampil
+        return view('dailyActivity.index', [
+            'data' => [
+                'dailyActivity' => $dailyActivity,
+            ]
+        ]);
     }
 }
