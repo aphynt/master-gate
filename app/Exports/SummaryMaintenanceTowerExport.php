@@ -20,11 +20,12 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
     use \Maatwebsite\Excel\Concerns\Exportable;
 
     private $data;
-    private $fileName = 'Tower_FMS_Report.xlsx';
+    private $fileName = 'Tower_Maintenance_FMS_Report.xlsx';
 
-    public function __construct(Collection $data)
+    public function __construct(Collection $data, $date)
     {
         $this->data = $data;
+        $this->date = $date;
     }
 
     public function collection()
@@ -34,7 +35,7 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
 
     public function title(): string
     {
-        return 'Tower FMS';
+        return 'Tower Maintenance Monthly';
     }
 
     public function drawings()
@@ -61,23 +62,23 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                 $sheet = $event->sheet->getDelegate();
 
                 // Header
-                $sheet->mergeCells('A1:H1');
+                $sheet->mergeCells('A1:I1');
                 $sheet->setCellValue('A1', 'Tower Maintenance Monthly Summary');
                 $sheet->getStyle('A1')->getFont()->setSize(14)->setBold(true);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
                 // Table headers
                 $startRow = 3;
-                $headers = ['No', 'Kode', 'Nama', 'Lokasi', 'Status', 'Terakhir Maintenance', 'Remarks', 'Reporting'];
+                $headers = ['No', 'Kode', 'Nama', 'Lokasi', 'Status', 'Terakhir Maintenance', 'Remarks', 'On-site', 'Reporting'];
                 $col = 'A';
                 foreach ($headers as $header) {
                     $sheet->setCellValue("{$col}{$startRow}", $header);
                     $col++;
                 }
 
-                $sheet->getStyle("A{$startRow}:H{$startRow}")->getFont()->setBold(true);
-                $sheet->getStyle("A{$startRow}:H{$startRow}")->getAlignment()->setHorizontal('center');
-                $sheet->getStyle("A{$startRow}:H{$startRow}")->getFill()->setFillType('solid')->getStartColor()->setRGB('D9E1F2');
+                $sheet->getStyle("A{$startRow}:I{$startRow}")->getFont()->setBold(true);
+                $sheet->getStyle("A{$startRow}:I{$startRow}")->getAlignment()->setHorizontal('center');
+                $sheet->getStyle("A{$startRow}:I{$startRow}")->getFill()->setFillType('solid')->getStartColor()->setRGB('D9E1F2');
 
                 // Table data
                 $row = $startRow + 1;
@@ -97,11 +98,12 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                         : ''
                 );
                     $sheet->setCellValue("G{$row}", $item->REMARKS);
-                    $sheet->setCellValue("H{$row}", $item->REPORTING);
+                    $sheet->setCellValue("H{$row}", $item->ACTION_BY);
+                    $sheet->setCellValue("I{$row}", $item->REPORTING);
 
                     // Highlight status Already Maintained
                     if (strtolower($item->STATUS) === 'already maintained') {
-                        $sheet->getStyle("A{$row}:H{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('C6EFCE');
+                        $sheet->getStyle("A{$row}:I{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('C6EFCE');
                     }
 
                     // Count summary
@@ -115,14 +117,14 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                     $row++;
                 }
 
-                foreach (range('A', 'H') as $col) {
+                foreach (range('A', 'I') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
 
-                $sheet->getStyle("A{$startRow}:H" . ($row - 1))->getBorders()->getAllBorders()
+                $sheet->getStyle("A{$startRow}:I" . ($row - 1))->getBorders()->getAllBorders()
                     ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-                    $dashboardColStart = 'J';
+                    $dashboardColStart = 'K';
                     $dashboardRowStart = 3;
 
                     $sheet->setCellValue("{$dashboardColStart}{$dashboardRowStart}", '◌ Tower Dashboard');
@@ -132,7 +134,7 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                         'Tower Type', 'Plan', 'Actual', 'Ach',
                         'Total Maintained', 'Ready For Maintenance', 'Today Maintained', 'Monthly Percentage'
                     ];
-                    $cols2 = ['J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+                    $cols2 = ['K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
 
                     foreach ($headers2 as $i => $header) {
                         $col = $cols2[$i];
@@ -148,7 +150,7 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                     ];
 
                     $row2 = $dashboardRowStart + 3;
-                    $today = now()->format('Y-m-d');
+                    $today = $this->date;
                     $currentMonth = now()->format('Y-m');
                     $rowStart = $row2;
                     foreach ($types as $code => $label) {
@@ -163,19 +165,17 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                         $readyForMaintenance = $filtered->where('STATUS', 'Ready For Maintenance')->count();
 
                         $todayMaintained = $filtered->filter(function ($item) use ($today) {
-                            return $item->STATUS === 'Already Maintained' &&
-                                isset($item->LAST_MAINTAINED) &&
-                                \Carbon\Carbon::parse($item->LAST_MAINTAINED)->format('Y-m-d') === $today;
+                            return $item->STATUS == 'Already Maintained' && Carbon::parse($item->LAST_MAINTAINED)->toDateString() == $today;
                         })->count();
 
                         // Set data ke sheet
-                        $sheet->setCellValue("J{$row2}", $label);
-                        $sheet->setCellValue("K{$row2}", $plan);
-                        $sheet->setCellValue("L{$row2}", $actual);
-                        $sheet->setCellValue("M{$row2}", $ach);
-                        $sheet->setCellValue("N{$row2}", $totalMaintained);
-                        $sheet->setCellValue("O{$row2}", $readyForMaintenance);
-                        $sheet->setCellValue("P{$row2}", $todayMaintained);
+                        $sheet->setCellValue("K{$row2}", $label);
+                        $sheet->setCellValue("L{$row2}", $plan);
+                        $sheet->setCellValue("M{$row2}", $actual);
+                        $sheet->setCellValue("N{$row2}", $ach);
+                        $sheet->setCellValue("O{$row2}", $totalMaintained);
+                        $sheet->setCellValue("P{$row2}", $readyForMaintenance);
+                        $sheet->setCellValue("Q{$row2}", $todayMaintained);
 
                         $row2++;
                     }
@@ -186,15 +186,16 @@ class SummaryMaintenanceTowerExport implements FromCollection, WithEvents, WithS
                     $totalMaintainedAll = collect($this->data)->where('STATUS', 'Already Maintained')->count();
                     $monthlyPercentage = $totalPlanAll > 0 ? round(($totalMaintainedAll / $totalPlanAll) * 100) . '%' : '0%';
 
-                    $sheet->mergeCells("Q{$rowStart}:Q{$rowEnd}");
-                    $sheet->setCellValue("Q{$rowStart}", $monthlyPercentage);
-                    $sheet->getStyle("Q{$rowStart}")->getAlignment()->setHorizontal('center');
-                    $sheet->getStyle("Q{$rowStart}")->getAlignment()->setVertical('center');
 
-                    $sheet->getStyle("J" . ($dashboardRowStart + 2) . ":Q" . ($row2 - 1))->getBorders()->getAllBorders()
+                    $sheet->mergeCells("R{$rowStart}:R{$rowEnd}");
+                    $sheet->setCellValue("R{$rowStart}", $monthlyPercentage);
+                    $sheet->getStyle("R{$rowStart}")->getAlignment()->setHorizontal('center');
+                    $sheet->getStyle("R{$rowStart}")->getAlignment()->setVertical('center');
+
+                    $sheet->getStyle("K" . ($dashboardRowStart + 2) . ":R" . ($row2 - 1))->getBorders()->getAllBorders()
                         ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-                    $sheet->getStyle("J" . ($dashboardRowStart + 2) . ":Q" . ($dashboardRowStart + 2))->getFont()->setBold(true);
-                    $sheet->getStyle("J" . ($dashboardRowStart + 2) . ":Q" . ($dashboardRowStart + 2))->getFill()
+                    $sheet->getStyle("K" . ($dashboardRowStart + 2) . ":R" . ($dashboardRowStart + 2))->getFont()->setBold(true);
+                    $sheet->getStyle("K" . ($dashboardRowStart + 2) . ":R" . ($dashboardRowStart + 2))->getFill()
                         ->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D9E1F2');
 
             },

@@ -82,7 +82,7 @@ class DailyActivityExport implements FromCollection, WithEvents, WithStyles, Wit
                 $sheet->setCellValue("C{$startRow}", 'Jam Action');
                 $sheet->setCellValue("D{$startRow}", 'Jam Finish');
                 $sheet->setCellValue("E{$startRow}", 'Activity');
-                $sheet->setCellValue("F{$startRow}", 'PIC');
+                $sheet->setCellValue("F{$startRow}", 'On-site');
                 $sheet->setCellValue("G{$startRow}", 'Reporting');
 
                 $sheet->getStyle("A{$startRow}:G{$startRow}")->getFont()->setBold(true);

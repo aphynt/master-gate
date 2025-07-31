@@ -1,4 +1,4 @@
-@include('layout.head', ['title' => 'Daily Activity'])
+@include('layout.head', ['title' => 'Summary Daily'])
 @include('layout.sidebar')
 @include('layout.header')
 <div class="page-container">
@@ -6,7 +6,7 @@
     <div class="page-title-box">
         <div class="d-flex align-items-center flex-wrap gap-2">
             <div class="flex-grow-1">
-                <h4 class="font-18 mb-0">Daily Activity</h4>
+                <h4 class="font-18 mb-0">Summary Daily</h4>
             </div>
 
             <form action="" method="GET" class="d-flex align-items-center gap-2">
@@ -46,7 +46,7 @@
                                     <th>Jam Action</th>
                                     <th>Jam Finish</th>
                                     <th>Activity</th>
-                                    <th>PIC</th>
+                                    <th>On-site</th>
                                     <th>Reporting</th>
                                 </tr>
                             </thead>

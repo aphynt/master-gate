@@ -4,6 +4,8 @@ namespace App\Exports;
 
 use App\Exports\DailyActivityExport;
 use App\Exports\HistoryRepairsExport;
+use App\Exports\SummaryRepairTowerExport;
+use App\Exports\SummaryRepairUnitExport;
 use App\Exports\SummaryMaintenanceTowerExport;
 use App\Exports\SummaryMaintenanceUnitExport;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -16,10 +18,11 @@ class SummaryDailyExport implements WithMultipleSheets
     protected $maintenanceUnit;
     protected $date;
 
-    public function __construct($dailyActivity, $historyRepair, $maintenanceTower, $maintenanceUnit, $date)
+    public function __construct($dailyActivity, $repairTower, $repairUnit, $maintenanceTower, $maintenanceUnit, $date)
     {
         $this->dailyActivity = $dailyActivity;
-        $this->historyRepair = $historyRepair;
+        $this->repairTower = $repairTower;
+        $this->repairUnit = $repairUnit;
         $this->maintenanceTower = $maintenanceTower;
         $this->maintenanceUnit = $maintenanceUnit;
         $this->date = $date;
@@ -29,9 +32,10 @@ class SummaryDailyExport implements WithMultipleSheets
     {
         return [
             new DailyActivityExport($this->dailyActivity, $this->date),
-            new HistoryRepairsExport($this->historyRepair),
-            new SummaryMaintenanceTowerExport($this->maintenanceTower),
-            // new SummaryMaintenanceUnitExport($this->maintenanceUnit),
+            new SummaryRepairTowerExport($this->repairTower, $this->date),
+            new SummaryRepairUnitExport($this->repairUnit, $this->date),
+            new SummaryMaintenanceTowerExport($this->maintenanceTower, $this->date),
+            new SummaryMaintenanceUnitExport($this->maintenanceUnit, $this->date),
         ];
     }
 }
