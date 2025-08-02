@@ -90,7 +90,7 @@ class ActivityUnitController extends Controller
     public function post(Request $request)
     {
         $activities = $request->input('data');
-        $consumables = json_decode($request->input('CONSUMABLE'), true);
+        $consumables = $request->filled('CONSUMABLE') ? json_decode($request->input('CONSUMABLE'), true) : [];
 
         try {
             // Menyimpan unit yang sudah diproses untuk consumable

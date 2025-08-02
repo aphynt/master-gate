@@ -138,15 +138,49 @@ class DailyActivityController extends Controller
             })
             ->values();
 
-        $historyRepair = collect()
-            ->merge($additional)
-            ->merge($tower)
-            ->merge($unit)
-            ->merge($genset)
-            ->sortBy('START')
-            ->values();
-
         $bulanTahun = request('DATE_REPORT') ?? Carbon::now()->format('Y-m');
+
+        $repairTower = DB::table('activity_tower as at')
+        ->leftJoin('list_tower as lt', 'at.UUID_TOWER', 'lt.UUID')
+        ->leftJoin('list_activity as la', 'at.UUID_ACTIVITY', 'la.UUID')
+        ->leftJoin('list_status as ls', 'at.UUID_STATUS', 'ls.UUID')
+        ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
+        ->select(
+            'at.UUID',
+            'lt.NAMA as NAMA_TOWER',
+            DB::raw("FORMAT(at.DATE_ACTION, 'yyyy-MM-dd') as DATE_ACTION"),
+            'la.KETERANGAN as NAMA_ACTIVITY',
+            'at.ACTUAL_PROBLEM',
+            'at.ACTION_PROBLEM',
+            'at.START',
+            'at.FINISH',
+            'ls.KETERANGAN as NAMA_STATUS',
+            'at.ACTION_BY',
+            'at.REMARKS',
+            'us.name as REPORTING',
+            'at.REPORTING as NRP_REPORTING',
+        )
+        ->where('at.STATUSENABLED', true)
+        ->where('la.ID', 1)
+        ->whereRaw("FORMAT(at.DATE_ACTION, 'yyyy-MM') = ?", [$bulanTahun])
+        ->get();
+
+        foreach ($repairTower as $act) {
+            $nrps = explode(',', $act->ACTION_BY);
+            $names = [];
+
+            foreach ($nrps as $nrp) {
+                $nrp = trim($nrp);
+                if (isset($users[$nrp])) {
+                    $names[] = $users[$nrp];
+                }
+            }
+
+            $act->ACTION_BY = implode(', ', $names);
+        }
+
+        dd($repairTower);
+
         $bulanUnit = request('DATE_REPORT')
             ? Carbon::parse(request('DATE_REPORT'))->format('Y-m')
             : Carbon::now()->format('Y-m');
@@ -282,7 +316,7 @@ class DailyActivityController extends Controller
             });
 
         if ($action === 'export') {
-            return Excel::download(new SummaryDailyExport($dailyActivity, $historyRepair, $maintenanceTower, $maintenanceUnit, $date), 'Summary Activity ' . Carbon::parse($request->DATE_REPORT)->translatedFormat('d F Y') . '.xlsx');
+            return Excel::download(new SummaryDailyExport($dailyActivity, $repairTower, $repairUnit, $maintenanceTower, $maintenanceUnit, $date), 'Summary Activity ' . Carbon::parse($request->DATE_REPORT)->translatedFormat('d F Y') . '.xlsx');
         }
 
         return view('dailyActivity.index', [

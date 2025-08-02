@@ -90,8 +90,7 @@ class ActivityTowerController extends Controller
     {
 
         $activities = $request->input('data');
-        $consumables = json_decode($request->input('CONSUMABLE'), true);
-
+        $consumables = $request->filled('CONSUMABLE') ? json_decode($request->input('CONSUMABLE'), true) : [];
         try {
             // Menyimpan tower yang sudah diberi consumable
             $towerConsumableDone = [];
