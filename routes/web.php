@@ -25,6 +25,7 @@ use App\Http\Controllers\ListUnitController;
 use App\Http\Controllers\MaintenanceTowerController;
 use App\Http\Controllers\MaintenanceUnitController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RitationPerHourController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -112,6 +113,11 @@ Route::group(['middleware' => ['auth']], function(){
 
     //Maintenance Unit
     Route::get('/maintenanceTower', [MaintenanceTowerController::class, 'index'])->name('maintenanceTower.index');
+
+    //Activity Tower
+    Route::get('/ritationPerHour', [RitationPerHourController::class, 'index'])->name('ritationPerHour.index');
+    Route::get('/ritationPerHour/edit', [RitationPerHourController::class, 'edit'])->name('ritationPerHour.edit');
+    Route::post('/ritationPerHour/update', [RitationPerHourController::class, 'update'])->name('ritationPerHour.update');
 
     //Activity Tower
     Route::get('/activityTower', [ActivityTowerController::class, 'index'])->name('activityTower.index');

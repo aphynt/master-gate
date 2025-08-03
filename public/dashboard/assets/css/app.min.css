@@ -17829,7 +17829,7 @@ html[data-topbar-color=dark] .app-topbar .logo .logo-dark {
 }
 
 .page-title-box {
-    padding: 20px 24px;
+    padding: 5px 24px;
     margin: 0 -24px 24px -24px;
     background-color: var(--bs-secondary-bg);
     -webkit-box-shadow: var(--bs-box-shadow);

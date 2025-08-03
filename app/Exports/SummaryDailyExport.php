@@ -13,13 +13,15 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 class SummaryDailyExport implements WithMultipleSheets
 {
     protected $dailyActivity;
-    protected $historyRepair;
+    protected $repairTower;
+    protected $repairUnit;
     protected $maintenanceTower;
     protected $maintenanceUnit;
     protected $date;
 
     public function __construct($dailyActivity, $repairTower, $repairUnit, $maintenanceTower, $maintenanceUnit, $date)
     {
+
         $this->dailyActivity = $dailyActivity;
         $this->repairTower = $repairTower;
         $this->repairUnit = $repairUnit;
@@ -32,8 +34,8 @@ class SummaryDailyExport implements WithMultipleSheets
     {
         return [
             new DailyActivityExport($this->dailyActivity, $this->date),
-            new SummaryRepairTowerExport($this->repairTower, $this->date),
-            new SummaryRepairUnitExport($this->repairUnit, $this->date),
+            new SummaryRepairTowerExport($this->repairTower),
+            new SummaryRepairUnitExport($this->repairUnit),
             new SummaryMaintenanceTowerExport($this->maintenanceTower, $this->date),
             new SummaryMaintenanceUnitExport($this->maintenanceUnit, $this->date),
         ];

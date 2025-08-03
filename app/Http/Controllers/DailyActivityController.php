@@ -138,7 +138,7 @@ class DailyActivityController extends Controller
             })
             ->values();
 
-        $bulanTahun = request('DATE_REPORT') ?? Carbon::now()->format('Y-m');
+        $bulanTahun = request()->filled('DATE_REPORT') ? substr(request('DATE_REPORT'), 0, 7) : Carbon::now()->format('Y-m');
 
         $repairTower = DB::table('activity_tower as at')
         ->leftJoin('list_tower as lt', 'at.UUID_TOWER', 'lt.UUID')
@@ -147,6 +147,8 @@ class DailyActivityController extends Controller
         ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
         ->select(
             'at.UUID',
+            'LT.TYPE_DESC',
+            'LT.LOKASI',
             'lt.NAMA as NAMA_TOWER',
             DB::raw("FORMAT(at.DATE_ACTION, 'yyyy-MM-dd') as DATE_ACTION"),
             'la.KETERANGAN as NAMA_ACTIVITY',
@@ -179,7 +181,48 @@ class DailyActivityController extends Controller
             $act->ACTION_BY = implode(', ', $names);
         }
 
-        dd($repairTower);
+
+        $repairUnit = DB::table('activity_unit as un')
+        ->leftJoin('list_unit as lt', 'un.UUID_UNIT', 'lt.UUID')
+        ->leftJoin('list_activity as la', 'un.UUID_ACTIVITY', 'la.UUID')
+        ->leftJoin('list_status as ls', 'un.UUID_STATUS', 'ls.UUID')
+        ->leftJoin('list_area as ar', 'un.UUID_AREA', 'ar.UUID')
+        ->leftJoin('users as us', 'un.REPORTING', 'us.nrp')
+        ->select(
+            'un.UUID',
+            'lt.VHC_ID as NAMA_UNIT',
+            'lt.TYPE_ID as TYPE_DESC',
+            DB::raw("FORMAT(un.DATE_ACTION, 'yyyy-MM-dd') as DATE_ACTION"),
+            'la.KETERANGAN as NAMA_ACTIVITY',
+            'un.ACTUAL_PROBLEM',
+            'un.ACTION_PROBLEM',
+            'un.START',
+            'un.FINISH',
+            'ar.KETERANGAN as LOKASI',
+            'ls.KETERANGAN as NAMA_STATUS',
+            'un.ACTION_BY',
+            'un.REMARKS',
+            'us.name as REPORTING',
+            'un.REPORTING as NRP_REPORTING',
+        )
+        ->where('un.STATUSENABLED', true)
+        ->where('la.ID', 1)
+        ->whereRaw("FORMAT(un.DATE_ACTION, 'yyyy-MM') = ?", [$bulanTahun])
+        ->get();
+
+        foreach ($repairUnit as $act) {
+            $nrps = explode(',', $act->ACTION_BY);
+            $names = [];
+
+            foreach ($nrps as $nrp) {
+                $nrp = trim($nrp);
+                if (isset($users[$nrp])) {
+                    $names[] = $users[$nrp];
+                }
+            }
+
+            $act->ACTION_BY = implode(', ', $names);
+        }
 
         $bulanUnit = request('DATE_REPORT')
             ? Carbon::parse(request('DATE_REPORT'))->format('Y-m')

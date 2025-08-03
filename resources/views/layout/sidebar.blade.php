@@ -133,6 +133,12 @@
                 </div>
             </li>
             <li class="side-nav-item">
+                <a href="{{ route('ritationPerHour.index') }}" class="side-nav-link">
+                    <span class="menu-icon"><img src="{{ asset('dashboard') }}/assets/images/sidebar/exchange.png" style="width: 20px"></i></span>
+                    <span class="menu-text"> Ritation Per Hour </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
                 <a href="{{ route('activityTower.index') }}" class="side-nav-link">
                     <span class="menu-icon"><img src="{{ asset('dashboard') }}/assets/images/sidebar/eiffel-tower.png" style="width: 20px"></i></span>
                     <span class="menu-text"> Tower </span>
