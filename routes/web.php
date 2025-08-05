@@ -26,6 +26,8 @@ use App\Http\Controllers\MaintenanceTowerController;
 use App\Http\Controllers\MaintenanceUnitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RitationPerHourController;
+use App\Http\Controllers\WeeklyActivityController;
+use App\Http\Controllers\WeeklyPlanController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -107,6 +109,18 @@ Route::group(['middleware' => ['auth']], function(){
 
     //Daily Activity
     Route::get('/dailyActivity', [DailyActivityController::class, 'index'])->name('dailyActivity.index');
+
+    //Weekly Activity
+    Route::get('/weeklyActivity', [WeeklyActivityController::class, 'index'])->name('weeklyActivity.index');
+
+    //Monthly Activity
+    Route::get('/monthlyActivity', [DailyActivityController::class, 'index'])->name('monthlyActivity.index');
+
+    //Plan Weekly
+    Route::get('/weeklyPlan', [WeeklyPlanController::class, 'index'])->name('weeklyPlan.index');
+    Route::get('/weeklyPlan/insert', [WeeklyPlanController::class, 'insert'])->name('weeklyPlan.insert');
+    Route::get('/weeklyPlan/delete/{uuid}', [WeeklyPlanController::class, 'delete'])->name('weeklyPlan.delete');
+    Route::post('/weeklyPlan/post', [WeeklyPlanController::class, 'post'])->name('weeklyPlan.post');
 
     //Maintenance Unit
     Route::get('/maintenanceUnit', [MaintenanceUnitController::class, 'index'])->name('maintenanceUnit.index');

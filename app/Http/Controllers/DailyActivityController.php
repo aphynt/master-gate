@@ -115,14 +115,18 @@ class DailyActivityController extends Controller
                 'gen.START',
                 'gen.FINISH',
                 DB::raw("CONCAT(gen.KEGIATAN, ' ', twr.NAMA, ' (', twr.NO_GENSET, '), Fuel: ', gen.FUEL, '%') as ACTIVITY"),
-                DB::raw("'-' as PIC"),
+                'gen.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'gen.DATE_REPORT',
                 DB::raw("'Tower' as TEAM")
             )
             ->where('gen.STATUSENABLED', true)
             ->where('gen.DATE_REPORT', $date)
-            ->get();
+            ->get()
+            ->map(function ($act) use ($convertPIC) {
+                $act->PIC = $convertPIC($act->PIC);
+                return $act;
+            });
 
         $teamOrder = ['All Team', 'Tower', 'Unit'];
 
