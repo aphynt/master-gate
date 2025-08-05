@@ -35,11 +35,12 @@
                                 <tr>
                                     <th rowspan="2">Select</th>
                                     <th rowspan="2" style="min-width: 100px;">JAM</th>
-                                    <th colspan="4" style="text-align: center;" id="tanggal-hari-ini"></th>
+                                    <th colspan="5" style="text-align: center;" id="tanggal-hari-ini"></th>
                                 </tr>
                                 <tr>
-                                    <th style="text-align: left;">Total</th>
-                                    <th style="text-align: left;">Realtime</th>
+                                    <th style="text-align: left;">Ritasi Total</th>
+                                    <th style="text-align: left;">Ritasi Realtime</th>
+                                    <th style="text-align: left;">Ritasi Not Realtime</th>
                                     <th style="text-align: left;">Ach</th>
                                     <th style="text-align: left; min-width: 500px;">Information</th>
                                 </tr>
@@ -53,12 +54,15 @@
                                 @php
                                     $sumRealtime += $final['REALTIME'];
                                     $sumTotal += $final['TOTAL'];
+                                    $selisih = $final['TOTAL'] - $final['REALTIME'];
+                                    $ach = ($final['TOTAL'] > 0) ? $final['REALTIME'] / $final['TOTAL'] * 100 : 0;
                                 @endphp
-                                    <tr>
+                                    <tr @if ($selisih >= 10) style="background-color:#ffc107;" @endif>
                                         <td style="text-align: left"><input type="checkbox" name="selected_items[]" value="{{ $final['CODE'] }}" style="cursor: pointer;"></td>
                                         <td style="text-align: left">{{ $final['RANGEHOUR'] }}</td>
                                         <td style="text-align: left">{{ $final['TOTAL'] }}</td>
                                         <td style="text-align: left">{{ $final['REALTIME'] }}</td>
+                                        <td style="text-align: left">{{ $final['TOTAL'] - $final['REALTIME'] }}</td>
                                         @php
                                             $ach = ($final['TOTAL'] > 0) ? $final['REALTIME'] / $final['TOTAL'] * 100 : 0;
                                         @endphp
