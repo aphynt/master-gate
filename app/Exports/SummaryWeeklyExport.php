@@ -138,6 +138,7 @@ class SummaryWeeklyExport implements FromCollection, WithEvents, WithStyles, Wit
                             }
                         }
 
+                $grouped = $grouped->sortBy('DATE_REPORT')->values();
                 $groupedByTeam = $grouped->groupBy('TEAM');
                 $yellowColor = 'FFFACD';
                 $highlightTime = Carbon::parse('16:30');
