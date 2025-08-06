@@ -242,7 +242,7 @@
             <li class="side-nav-title">Authentication</li>
 
              <li class="side-nav-item">
-                <a href="#" onclick="Swal.fire({ icon: 'info', title: 'Upps!', text: 'Maaf, menu ini belum berfungsi.', confirmButtonText: 'OK' })" class="side-nav-link">
+                <a href="{{ route('profile.index') }}" class="side-nav-link">
                     <span class="menu-icon"><img src="{{ asset('dashboard') }}/assets/images/sidebar/profile.png" style="width: 20px"></i></span>
                     <span class="menu-text"> Profile </span>
                 </a>

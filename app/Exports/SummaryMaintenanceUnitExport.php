@@ -228,15 +228,16 @@ class SummaryMaintenanceUnitExport implements FromCollection, WithEvents, WithSt
                     \Carbon\Carbon::parse($item->LAST_MAINTAINED)->format('Y-m-d') === $today
                 )->count();
 
+
                 // Hitung persentase
                 $percentage = fn($value, $total) => $total > 0 ? round(($value / $total) * 100) . '%' : '0%';
                 $totalMaintainedPercent = $totalMaintainedAll;
                 $readyForMaintenancePercent = $readyForMaintenance;
-                $todayMaintainedPercent = $percentage($totalMaintainedAll, $totalPlanAll);
-                $dailyPercent = $percentage($totalMaintainedAll, 7);
+                $todayMaintainedPercent = $percentage($todayMaintained, 7);
+
                 $monthlyPercent = $percentage($totalMaintainedAll, $totalPlanAll);
 
-                $columns = ['P' => $totalMaintainedPercent, 'Q' => $readyForMaintenancePercent, 'R' => $todayMaintainedPercent, 'S' => $dailyPercent, 'T' => $monthlyPercent];
+                $columns = ['P' => $totalMaintainedPercent, 'Q' => $readyForMaintenancePercent, 'R' => $todayMaintained, 'S' => $todayMaintainedPercent, 'T' => $monthlyPercent];
                 $rowStart = $dashboardRowStart + 2;
                 $rowEnd = $row - 1;
 
