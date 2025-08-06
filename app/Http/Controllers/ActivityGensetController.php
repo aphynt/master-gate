@@ -22,8 +22,6 @@ class ActivityGensetController extends Controller
             $date = Carbon::today()->format('Y-m-d');
         }
 
-
-
         $users = DB::table('users')->pluck('name', 'nrp');
 
         $activity = DB::table('activity_genset as gen')
@@ -47,7 +45,56 @@ class ActivityGensetController extends Controller
             ->get();
 
 
-        return view('activityGenset.index', compact('activity'));
+        $gensets = DB::table('activity_genset as gen')
+            ->leftJoin('users as us', 'gen.REPORTING', 'us.nrp')
+            ->leftJoin('list_tower as twr', 'gen.UUID_TOWER', 'twr.UUID')
+            ->select(
+                'gen.UUID',
+                'gen.STATUSENABLED',
+                'gen.DATE_REPORT',
+                'twr.NAMA as NAMA_TOWER',
+                'twr.NO_GENSET',
+                'gen.KEGIATAN',
+                'gen.START',
+                'gen.FINISH',
+                'gen.FUEL',
+                'us.nrp as NRP_REPORTING',
+                'us.name as REPORTING',
+                'twr.CYCLE_DURATION'
+            )
+            ->where('gen.STATUSENABLED', true)
+            ->whereNotNull('twr.CYCLE_DURATION')
+            ->orderBy('gen.DATE_REPORT', 'desc')
+             ->limit(20)
+            ->get()
+            ->groupBy('NAMA_TOWER');
+
+        $jadwals = [];
+
+        foreach ($gensets as $towerName => $records) {
+            $latest = $records->first();
+            $dateReport = Carbon::parse($latest->DATE_REPORT);
+            $cycleDays = (int) $latest->CYCLE_DURATION;
+
+            if ($latest->KEGIATAN === 'TURN ON') {
+                $nextAction = 'TURN OFF';
+                $nextActionDate = $dateReport->copy()->addDay(); // besoknya
+            } else {
+                $nextAction = 'TURN ON';
+                $nextActionDate = $dateReport->copy()->addDays($cycleDays); // sesuai cycle
+            }
+
+            $jadwals[] = [
+                'tower' => $towerName,
+                'last_activity' => $latest->KEGIATAN,
+                'last_date' => $dateReport->translatedFormat('d F Y'),
+                'next_activity' => $nextAction,
+                'next_date' => $nextActionDate->translatedFormat('d F Y'),
+            ];
+        }
+
+
+        return view('activityGenset.index', compact('activity', 'jadwals'));
     }
 
     public function insert()

@@ -77,6 +77,38 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body pt-2">
+                    <h6>Plan Genset <small class="text-muted">({{ \Carbon\Carbon::now()->translatedFormat('d F Y') }})</small></h6>
+                    <table id="datatable" class="table table-bordered dt-responsive"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>TOWER</th>
+                                <th>ACTIVITY</th>
+                                <th>LAST ACTION</th>
+                                <th>NEXT ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($jadwals as $i => $item)
+                            <tr>
+                                <td>{{ $i + 1 }}</td>
+                                <td>{{ $item['tower'] }}</td>
+                                <td>{{ $item['last_activity'] }}</td>
+                                <td>{{ $item['last_date'] }}</td>
+                                <td>{{ $item['next_activity'] }} ({{ $item['next_date'] }})</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
