@@ -21,22 +21,8 @@
             <div class="card tilebox-one">
                 <div class="card-body">
                     <i class="icon-layers float-end m-0 h2 text-muted"></i>
-                    <h6 class="text-muted text-uppercase mt-0">Orders</h6>
-                    <h3 class="my-3" data-plugin="counterup">1,587</h3>
-                    <span class="badge bg-success me-1"> +11% </span> <span class="text-muted">From previous
-                        period</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="card tilebox-one">
-                <div class="card-body">
-                    <i class="icon-paypal float-end m-0 h2 text-muted"></i>
-                    <h6 class="text-muted text-uppercase mt-0">Revenue</h6>
-                    <h3 class="my-3">$<span data-plugin="counterup">46,782</span></h3>
-                    <span class="badge bg-danger me-1"> -29% </span> <span class="text-muted">From previous
-                        period</span>
+                    <h6 class="text-muted text-uppercase mt-0">Stok Barang <span class="text-success" style="font-size: 8pt">(Monthly)</span></h6>
+                    <h3 class="my-3" data-plugin="counterup">-</h3>
                 </div>
             </div>
         </div>
@@ -45,10 +31,8 @@
             <div class="card tilebox-one">
                 <div class="card-body">
                     <i class="icon-chart float-end m-0 h2 text-muted"></i>
-                    <h6 class="text-muted text-uppercase mt-0">Average Price</h6>
-                    <h3 class="my-3">$<span data-plugin="counterup">15.9</span></h3>
-                    <span class="badge bg-danger me-1"> 0% </span> <span class="text-muted">From previous
-                        period</span>
+                    <h6 class="text-muted text-uppercase mt-0">Barang Masuk <span class="text-success" style="font-size: 8pt">(Monthly)</span></h6>
+                    <h3 class="my-3"><span data-plugin="counterup">-</span></h3>
                 </div>
             </div>
         </div>
@@ -56,16 +40,178 @@
         <div class="col-md-6 col-xl-3">
             <div class="card tilebox-one">
                 <div class="card-body">
-                    <i class="icon-rocket float-end m-0 h2 text-muted"></i>
-                    <h6 class="text-muted text-uppercase mt-0">Product Sold</h6>
-                    <h3 class="my-3" data-plugin="counterup">1,890</h3>
-                    <span class="badge bg-warning me-1"> +89% </span> <span class="text-muted">Last year</span>
+                    <i class="icon-chart float-end m-0 h2 text-muted"></i>
+                    <h6 class="text-muted text-uppercase mt-0">Barang Keluar <span class="text-success" style="font-size: 8pt">(Monthly)</span></h6>
+                    <h3 class="my-3"><span data-plugin="counterup">-</span></h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card tilebox-one">
+                <div class="card-body">
+                    <i class="icon-chart float-end m-0 h2 text-muted"></i>
+                    <h6 class="text-muted text-uppercase mt-0">Barang Keluar <span class="text-success" style="font-size: 8pt">(Daily)</span></h6>
+                    <h3 class="my-3" data-plugin="counterup">-</h3>
                 </div>
             </div>
         </div>
     </div> <!-- end row -->
+<div class="row">
+        <div class="col-xl-7">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">Today's Maintained Unit (Target: 7 unit/day)</h4>
 
-    <div class="row">
+                        <p class="font-weight-semibold mb-3">{{ $dataSummary['todayMaintainedUnit'] }} <span class="text-success float-end"><b>{{ $dataSummary['todayMaintainedPercentUnit'] }}%</b></span>
+                        </p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                                style="width: {{ $dataSummary['todayMaintainedPercentUnit'] }}%" aria-valuenow="{{ $dataSummary['todayMaintainedPercentUnit'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">Yesterday's Maintained Unit (Target: 7 unit/day)</h4>
+
+                        <p class="font-weight-semibold mb-2">{{ $dataSummary['yesterdayMaintainedUnit'] }} <span
+                                class="text-info float-end"><b>{{ $dataSummary['yesterdayMaintainedPercentUnit'] }}%</b></span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-info" role="progressbar"
+                                style="width: {{ $dataSummary['yesterdayMaintainedPercentUnit'] }}%" aria-valuenow="{{ $dataSummary['yesterdayMaintainedPercentUnit'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">This Month's Maintained Unit</h4>
+
+                        <p class="font-weight-semibold mb-2">{{ $dataSummary['monthlyMaintainedUnit'] }} <span
+                                class="text-dark float-end"><b>{{ $dataSummary['monthlyMaintainedPercentUnit'] }}%</b></span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-dark" role="progressbar"
+                                style="width: {{ $dataSummary['monthlyMaintainedPercentUnit'] }}%" aria-valuenow="{{ $dataSummary['monthlyMaintainedPercentUnit'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">Today's Maintained Tower (Target: 1 tower/day)</h4>
+
+                        <p class="font-weight-semibold mb-3">{{ $dataSummary['todayMaintainedTower'] }} <span class="text-success float-end"><b>{{ $dataSummary['todayMaintainedPercentTower'] }}%</b></span>
+                        </p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                                style="width: {{ $dataSummary['todayMaintainedPercentTower'] }}%" aria-valuenow="{{ $dataSummary['todayMaintainedPercentTower'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">Yesterday's Maintained Tower (Target: 1 tower/day)</h4>
+
+                        <p class="font-weight-semibold mb-2">{{ $dataSummary['yesterdayMaintainedTower'] }} <span
+                                class="text-info float-end"><b>{{ $dataSummary['yesterdayMaintainedPercentTower'] }}%</b></span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-info" role="progressbar"
+                                style="width: {{ $dataSummary['yesterdayMaintainedPercentTower'] }}%" aria-valuenow="{{ $dataSummary['yesterdayMaintainedPercentTower'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">This Month's Maintained Tower</h4>
+
+                        <p class="font-weight-semibold mb-2">{{ $dataSummary['monthlyMaintainedTower'] }} <span
+                                class="text-dark float-end"><b>{{ $dataSummary['monthlyMaintainedPercentTower'] }}%</b></span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-dark" role="progressbar"
+                                style="width: {{ $dataSummary['monthlyMaintainedPercentTower'] }}%" aria-valuenow="{{ $dataSummary['monthlyMaintainedPercentTower'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div><!-- end col-->
+
+        <div class="col-xl-5">
+            <div class="card card-body">
+
+                <h4 class="header-title mb-3">Status Unit</h4>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-nowrap mb-0">
+                        <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th style="text-align: center">EX</th>
+                                    <th style="text-align: center">HD</th>
+                                    <th style="text-align: center">MG</th>
+                                    <th style="text-align: center">BD</th>
+                                    <th style="text-align: center">WT</th>
+                                    <th style="text-align: center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(['Operasi', 'Standby', 'Breakdown'] as $status)
+                                    <tr>
+                                        <td>{{ $status }}</td>
+
+                                        <!-- Tipe kendaraan -->
+                                        @foreach(['EX', 'HD', 'MG', 'BD', 'WT'] as $type)
+                                            <td style="text-align: center">
+                                                {{
+                                                    $dataSummary['statusUnit']->where('VSA_GROUPDESC', $status)
+                                                               ->where('VHC_TYPE', $type)
+                                                               ->sum('NDATA')
+                                                }}
+                                            </td>
+                                        @endforeach
+
+                                        <!-- Total per status -->
+                                        <td style="text-align: center">
+                                            {{
+                                                $dataSummary['statusUnit']->where('VSA_GROUPDESC', $status)
+                                                           ->sum('NDATA')
+                                            }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+
+                            <!-- Total keseluruhan -->
+                            <tfoot>
+                                <tr>
+                                    <td>Total</td>
+                                    @foreach(['EX', 'HD', 'MG', 'BD', 'WT'] as $type)
+                                        <td style="text-align: center">
+                                            {{
+                                                $dataSummary['statusUnit']->where('VHC_TYPE', $type)
+                                                           ->sum('NDATA')
+                                            }}
+                                        </td>
+                                    @endforeach
+                                    <td style="text-align: center">
+                                        {{
+                                            $dataSummary['statusUnit']->sum('NDATA')
+                                        }}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div><!-- end col-->
+
+    </div>
+    {{-- <div class="row">
         <div class="col-lg-6 col-xl-8">
             <div class="card card-body">
                 <h4 class="header-title mb-3">Sales Statistics</h4>
@@ -118,221 +264,9 @@
                 </div>
             </div>
         </div><!-- end col-->
-    </div> <!-- end row -->
+    </div> --}}
 
-    <div class="row">
-        <div class="col-xl-7">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="header-title mb-3">Inbox</h4>
-                        </div>
-
-                        <div class="inbox-widget px-4" data-simplebar style="max-height: 332px;">
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-1.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Chadengle</p>
-                                        <p class="text-muted mb-0">Hey! there I'm available...</p>
-                                    </div>
-                                    <p class="font-12 text-body">13:40 PM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-2.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Tomaslau</p>
-                                        <p class="text-muted mb-0 text-truncate">I've finished it! See you so...
-                                        </p>
-                                    </div>
-                                    <p class="font-12 text-body">13:34 PM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-3.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Stillnotdavid</p>
-                                        <p class="text-muted mb-0">This theme is awesome!</p>
-                                    </div>
-                                    <p class="font-12 text-body">13:17 PM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-4.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Kurafire</p>
-                                        <p class="text-muted mb-0">Nice to meet you</p>
-                                    </div>
-                                    <p class="font-12 text-body">12:20 PM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-5.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Shahedk</p>
-                                        <p class="text-muted mb-0">Hey! there I'm available...</p>
-                                    </div>
-                                    <p class="font-12 text-body">10:15 AM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-6.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Adhamdannaway</p>
-                                        <p class="text-muted mb-0">This theme is awesome!</p>
-                                    </div>
-                                    <p class="font-12 text-body">9:56 AM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-8.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Arashasghari</p>
-                                        <p class="text-muted mb-0">Hey! there I'm available...</p>
-                                    </div>
-                                    <p class="font-12 text-body">10:15 AM</p>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="d-flex align-items-center gap-2 py-2">
-                                    <div class="inbox-item-img"><img
-                                            src="{{ asset('dashboard') }}/assets/images/users/avatar-9.jpg"
-                                            class="rounded-circle avatar-lg" alt=""></div>
-                                    <div class="me-auto">
-                                        <p class="text-body mb-0">Joshaustin</p>
-                                        <p class="text-muted mb-0">I've finished it! See you so...</p>
-                                    </div>
-                                    <p class="font-12 text-body">9:56 AM</p>
-                                </div>
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card card-body">
-                        <h4 class="header-title mb-3">Sales Statistics</h4>
-
-                        <p class="font-weight-semibold mb-3">iMacs <span class="text-danger float-end"><b>78%</b></span>
-                        </p>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar progress-bar-striped bg-danger" role="progressbar"
-                                style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="78">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card card-body">
-                        <h4 class="header-title mb-3">Monthly Sales</h4>
-
-                        <p class="font-weight-semibold mb-2">Macbooks <span
-                                class="text-success float-end"><b>25%</b></span></p>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
-                                style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card card-body">
-                        <h4 class="header-title mb-3">Daily Sales</h4>
-
-                        <p class="font-weight-semibold mb-2">Mobiles <span
-                                class="text-warning float-end"><b>75%</b></span></p>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar progress-bar-striped bg-warning" role="progressbar"
-                                style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div><!-- end col-->
-
-        <div class="col-xl-5">
-            <div class="card card-body">
-
-                <h4 class="header-title mb-3">Top Contracts</h4>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-nowrap mb-0">
-                        <thead>
-                            <tr>
-                                <th>Company</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th class="text-muted">Apple Technology</th>
-                                <td>20/02/2014</td>
-                                <td>19/02/2020</td>
-                                <td><span class="badge bg-success">Paid</span></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Envato Pty Ltd.</th>
-                                <td>20/02/2014</td>
-                                <td>19/02/2020</td>
-                                <td><span class="badge bg-danger">Unpaid</span></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Dribbble LLC.</th>
-                                <td>20/02/2014</td>
-                                <td>19/02/2020</td>
-                                <td><span class="badge bg-success">Paid</span></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Adobe Family</th>
-                                <td>20/02/2014</td>
-                                <td>19/02/2020</td>
-                                <td><span class="badge bg-success">Paid</span></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Apple Technology</th>
-                                <td>20/02/2014</td>
-                                <td>19/02/2020</td>
-                                <td><span class="badge bg-danger">Unpaid</span></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Envato Pty Ltd.</th>
-                                <td>20/02/2014</td>
-                                <td>19/02/2020</td>
-                                <td><span class="badge bg-success">Paid</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div><!-- end col-->
-
-    </div> <!-- end row -->
+     <!-- end row -->
 
 </div>
 @include('layout.footer')
