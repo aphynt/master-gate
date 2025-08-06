@@ -126,7 +126,7 @@ class BarangKeluarController extends Controller
             BarangKeluar::where('UUID', $uuid)->update([
                 'JUMLAH' => $request->JUMLAH,
                 'KETERANGAN' => $request->KETERANGAN,
-                'UPDATED_AT' => now(),
+                // 'UPDATED_AT' => now(),
                 'UPDATED_BY' => Auth::user()->nrp,
             ]);
 
