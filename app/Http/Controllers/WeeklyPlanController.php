@@ -39,7 +39,7 @@ class WeeklyPlanController extends Controller
 
 
         $tanggalSekarang = Carbon::parse($tanggal);
-        $selisihHari = ($tanggalSekarang->dayOfWeek - 4 + 7) % 7;
+        $selisihHari = ($tanggalSekarang->dayOfWeek - 3 + 7) % 7;
         $startDate = $tanggalSekarang->copy()->subDays($selisihHari);
         $endDate = $startDate->copy()->addDays(6);
 

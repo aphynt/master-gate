@@ -36,7 +36,7 @@
                     $tanggalSekarang = Carbon::parse($tanggal);
 
                     // Hitung jarak dari Kamis
-                    $selisihHari = ($tanggalSekarang->dayOfWeek - 4 + 7) % 7;
+                    $selisihHari = ($tanggalSekarang->dayOfWeek - 3 + 7) % 7;
 
                     // Kamis minggu ini
                     $startMingguIni = $tanggalSekarang->copy()->subDays($selisihHari);
