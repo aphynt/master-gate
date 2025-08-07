@@ -40,24 +40,33 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($barang as $brg)
-                            <tr>
+                           @foreach ($barang as $brg)
+                            @php
+                                $masuk = $barangMasuk[$brg->UUID]->total_masuk ?? 0;
+                                $keluar = $barangKeluar[$brg->UUID]->total_keluar ?? 0;
+                                $stokAwal = $brg->STOK_AKHIR ?? 0;
+                                $stokAkhir = $stokAwal + $masuk - $keluar;
+                            @endphp
+                            <tr style="{{ $stokAkhir < 0 ? 'background-color: #fff3cd;' : '' }}">
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $brg->UUID }}</td>
+                                <td>{{ \Illuminate\Support\Str::substr($brg->UUID, 0, 8) }}</td>
                                 <td>{{ $brg->ITEM }}</td>
                                 <td>{{ $brg->DESCRIPTION }}</td>
                                 <td>{{ $brg->STATUS }}</td>
-                                <td>{{ $brg->STOK_AKHIR }}</td>
-                                <td></td>
+                                <td>{{ $stokAwal }}</td>
+                                <td>{{ $stokAkhir }}</td>
                                 <td>
-                                    <a href="#deleteBarang{{ $brg->UUID }}"
-                                        class="btn btn-danger waves-effect waves-light btn-sm" data-animation="contentscale"
+                                    @if ($brg->ADD_BY == Auth::user()->nrp)
+                                    <a href="#deleteBarang{{ $brg->UUID }}" class="btn btn-danger btn-sm"
                                         data-plugin="custommodal" data-overlaySpeed="100"
                                         data-overlayColor="#36404a">Hapus</a>
-                                        @include('barang.modal.delete')
+                                    @include('barang.modal.delete')
+                                    @else
+                                    -
+                                    @endif
+
                                 </td>
                             </tr>
-
                             @endforeach
                         </tbody>
                     </table>

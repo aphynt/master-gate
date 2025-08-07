@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class BarangController extends Controller
@@ -13,7 +14,25 @@ class BarangController extends Controller
     public function index()
     {
         $barang = Barang::where('STATUSENABLED', true)->get();
-        return view('barang.index', compact('barang'));
+
+
+        $barangMasuk = DB::table('LOG_BARANG_MASUK')
+        ->select('UUID_BARANG', DB::raw('SUM(JUMLAH) as total_masuk'))
+        ->where('STATUSENABLED', true)
+        ->groupBy('UUID_BARANG')
+        ->get()
+        ->keyBy('UUID_BARANG');
+
+
+
+        $barangKeluar = DB::table('LOG_BARANG_KELUAR')
+        ->select('UUID_BARANG', DB::raw('SUM(JUMLAH) as total_keluar'))
+        ->where('STATUSENABLED', true)
+        ->groupBy('UUID_BARANG')
+        ->get()
+        ->keyBy('UUID_BARANG');
+
+        return view('barang.index', compact('barang', 'barangMasuk', 'barangKeluar'));
     }
 
     public function post(Request $request)
