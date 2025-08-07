@@ -55,7 +55,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($unit as $unt)
-                                <tr>
+                                <tr style="{{ $unt->NAMA_STATUS == 'Open' ? 'background-color: #fff3cd;' : '' }}">
                                     <td>
                                         @if (Auth::user()->nrp == $unt->NRP_REPORTING)
                                         <input type="checkbox" name="selected_items[]" value="{{ $unt->UUID }}" style="cursor: pointer;">

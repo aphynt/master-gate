@@ -55,7 +55,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($tower as $twr)
-                                <tr>
+                                <tr style="{{ $twr->NAMA_STATUS == 'Open' ? 'background-color: #fff3cd;' : '' }}">
                                     <td>
                                         @if (Auth::user()->nrp == $twr->NRP_REPORTING)
                                         <input type="checkbox" name="selected_items[]" value="{{ $twr->UUID }}" style="cursor: pointer;">
