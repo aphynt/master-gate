@@ -72,7 +72,6 @@
                                                 <th style="width: 80px;">START</th>
                                                 <th style="width: 80px;">FINISH</th>
                                                 <th style="width: 120px;">STATUS</th>
-                                                <th style="width: 180px;">ACTION BY</th>
                                                 <th style="width: 180px;">PART & CONSUMABLE</th>
                                                 <th style="width: 180px;">REMARKS</th>
                                             </tr>
@@ -124,7 +123,7 @@
                                                         @endforeach
                                                     </select>
                                                 </td>
-                                                @php
+                                                {{-- @php
                                                     $selectedActionBy = array_unique(explode(',', $to->ACTION_BY ?? ''));
 
                                                     $uniqueUsers = collect($user)
@@ -146,7 +145,7 @@
                                                             <option value="{{ $us->NRP }}">{{ $us->NAMA_PANGGILAN }}</option>
                                                         @endforeach
                                                     </select>
-                                                </td>
+                                                </td> --}}
 
                                                 <td>
                                                     <button type="button" class="btn btn-purple btn-sm"

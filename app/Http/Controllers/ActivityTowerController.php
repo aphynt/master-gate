@@ -189,11 +189,11 @@ class ActivityTowerController extends Controller
                     $uuidTower = $row['UUID_TOWER'];
 
                     // Proses ACTION_BY jika ada
-                    $cleanedActionBy = [];
-                    if (isset($row['ACTION_BY']) && !empty($row['ACTION_BY'])) {
-                        $actionByArray = is_array($row['ACTION_BY']) ? $row['ACTION_BY'] : explode(',', $row['ACTION_BY']);
-                        $cleanedActionBy = array_unique(array_map('trim', $actionByArray));
-                    }
+                    // $cleanedActionBy = [];
+                    // if (isset($row['ACTION_BY']) && !empty($row['ACTION_BY'])) {
+                    //     $actionByArray = is_array($row['ACTION_BY']) ? $row['ACTION_BY'] : explode(',', $row['ACTION_BY']);
+                    //     $cleanedActionBy = array_unique(array_map('trim', $actionByArray));
+                    // }
 
                     $updateData = [
                         'UUID_TOWER' => $uuidTower,
@@ -208,9 +208,9 @@ class ActivityTowerController extends Controller
                         'UPDATED_BY' => Auth::user()->nrp,
                     ];
 
-                    if (!empty($cleanedActionBy)) {
-                        $updateData['ACTION_BY'] = implode(',', $cleanedActionBy);
-                    }
+                    // if (!empty($cleanedActionBy)) {
+                    //     $updateData['ACTION_BY'] = implode(',', $cleanedActionBy);
+                    // }
 
                     ActivityTower::where('UUID', $uuidActivity)->update($updateData);
 
