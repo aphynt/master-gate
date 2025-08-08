@@ -18,7 +18,7 @@
 
             <div>
                 <button id="btn-edit-data" class="btn btn-purple waves-effect waves-light" type="button">
-                    Edit Data
+                    Update Information
                 </button>
             </div>
         </div>
@@ -29,13 +29,14 @@
             <div class="card">
                 <div class="card-body pt-2">
                     <form id="form-tower" >
+                        <h4 style="text-align: center">REALTIME RITATION</h4>
                         <table class="table table-bordered"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
-                                    <th rowspan="2">Select</th>
-                                    <th rowspan="2" style="min-width: 100px;">JAM</th>
-                                    <th colspan="5" style="text-align: center;" id="tanggal-hari-ini"></th>
+                                    <th rowspan="2" style="vertical-align: middle; text-align: center;">Select</th>
+                                    <th rowspan="2" style="min-width: 100px; vertical-align: middle; text-align: center;">JAM</th>
+                                    <th colspan="5" id="tanggal-hari-ini" style="text-align: center; vertical-align: middle;"></th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: left;">Ritasi Total</th>
@@ -45,43 +46,93 @@
                                     <th style="text-align: left; min-width: 500px;">Information</th>
                                 </tr>
                             </thead>
+                            @php
+                                $sumRealtime = 0;
+                                $sumTotal = 0;
+                                $sumNotRealtime = 0;
+
+                                // Siang dan Malam
+                                $sumTotalSiang = 0;
+                                $sumRealtimeSiang = 0;
+                                $sumNotRealtimeSiang = 0;
+
+                                $sumTotalMalam = 0;
+                                $sumRealtimeMalam = 0;
+                                $sumNotRealtimeMalam = 0;
+                            @endphp
+
                             <tbody id="tower-tbody">
-                                @php
-                                    $sumRealtime = 0;
-                                    $sumTotal = 0;
-                                @endphp
                                 @foreach ($finalRitation as $final)
-                                @php
-                                    $sumRealtime += $final['REALTIME'];
-                                    $sumTotal += $final['TOTAL'];
-                                    $selisih = $final['TOTAL'] - $final['REALTIME'];
-                                    $ach = ($final['TOTAL'] > 0) ? $final['REALTIME'] / $final['TOTAL'] * 100 : 0;
-                                @endphp
-                                    <tr @if ($selisih >= 10) style="background-color:#ffc107;" @endif>
-                                        <td style="text-align: left"><input type="checkbox" name="selected_items[]" value="{{ $final['CODE'] }}" style="cursor: pointer;"></td>
-                                        <td style="text-align: left">{{ $final['RANGEHOUR'] }}</td>
-                                        <td style="text-align: left">{{ $final['TOTAL'] }}</td>
-                                        <td style="text-align: left">{{ $final['REALTIME'] }}</td>
-                                        <td style="text-align: left">{{ $final['TOTAL'] - $final['REALTIME'] }}</td>
-                                        @php
-                                            $ach = ($final['TOTAL'] > 0) ? $final['REALTIME'] / $final['TOTAL'] * 100 : 0;
-                                        @endphp
-                                        <td style="text-align: left; {{ $ach > 0 && $ach < 95.0 ? 'color: red;' : '' }}">
-                                            {{ number_format($ach, 1) }}%
-                                        </td>
-                                        <td style="text-align: left">{{ $final['INFORMATION'] }}</td>
+                                     @php
+                                        $jam = $final['RANGEHOUR'];
+
+                                        $startHour = (int)explode(':', explode('-', $jam)[0])[0];
+
+                                        $total = $final['TOTAL'];
+                                        $realtime = $final['REALTIME'];
+                                        $notRealtime = $total - $realtime;
+                                        $ach = ($total > 0) ? ($realtime / $total * 100) : 0;
+
+                                        $sumTotal += $total;
+                                        $sumRealtime += $realtime;
+                                        $sumNotRealtime += $notRealtime;
+
+                                        // ✅ Siang: 07:00 – 18:59 (jam awal 07 – 18)
+                                        if ($startHour >= 7 && $startHour <= 18) {
+                                            $sumTotalSiang += $total;
+                                            $sumRealtimeSiang += $realtime;
+                                            $sumNotRealtimeSiang += $notRealtime;
+                                        } else {
+                                            $sumTotalMalam += $total;
+                                            $sumRealtimeMalam += $realtime;
+                                            $sumNotRealtimeMalam += $notRealtime;
+                                        }
+                                    @endphp
+                                    <tr @if ($notRealtime >= 10) style="background-color:#ffc107;" @endif>
+                                        <td><input type="checkbox" name="selected_items[]" value="{{ $final['CODE'] }}" style="cursor: pointer;"></td>
+                                        <td>{{ $jam }}</td>
+                                        <td>{{ $total }}</td>
+                                        <td>{{ $realtime }}</td>
+                                        <td>{{ $notRealtime }}</td>
+                                        <td style="{{ $ach > 0 && $ach < 95.0 ? 'color: red;' : '' }}">{{ number_format($ach, 1) }}%</td>
+                                        <td>{{ $final['INFORMATION'] }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
+
                             <tfoot>
-                                <tr>
-                                    <th colspan="4" style="text-align: right">Total</th>
+                                <tr style="background-color: #d0ebff;">
+                                    <th colspan="2" style="text-align: right">Siang</th>
+                                    <th>{{ $sumTotalSiang }}</th>
+                                    <th>{{ $sumRealtimeSiang }}</th>
+                                    <th>{{ $sumNotRealtimeSiang }}</th>
+                                    <th style="text-align: left">
+                                        {{ $sumTotalSiang > 0 ? number_format($sumRealtimeSiang / $sumTotalSiang * 100, 1) . '%' : '0%' }}
+                                    </th>
+                                    <th></th>
+                                </tr>
+                                <tr style="background-color: #dcdcdc;">
+                                    <th colspan="2" style="text-align: right">Malam</th>
+                                    <th>{{ $sumTotalMalam }}</th>
+                                    <th>{{ $sumRealtimeMalam }}</th>
+                                    <th>{{ $sumNotRealtimeMalam }}</th>
+                                    <th style="text-align: left">
+                                        {{ $sumTotalMalam > 0 ? number_format($sumRealtimeMalam / $sumTotalMalam * 100, 1) . '%' : '0%' }}
+                                    </th>
+                                    <th></th>
+                                </tr>
+                                <tr style="background-color: #d4edda;">
+                                    <th colspan="2" style="text-align: right">Grand Total</th>
+                                    <th>{{ $sumTotal }}</th>
+                                    <th>{{ $sumRealtime }}</th>
+                                    <th>{{ $sumNotRealtime }}</th>
                                     <th style="text-align: left">
                                         {{ $sumTotal > 0 ? number_format($sumRealtime / $sumTotal * 100, 1) . '%' : '0%' }}
                                     </th>
                                     <th></th>
                                 </tr>
                             </tfoot>
+
                         </table>
                     </form>
                 </div>

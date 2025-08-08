@@ -92,7 +92,15 @@
     </div>
 </div>
 
+@include('layout.footer')
 <script>
+    $(document).ready(function () {
+        $('#datatable').DataTable({
+            pageLength: 50,
+            destroy: true
+        });
+    });
+
 document.addEventListener('DOMContentLoaded', function () {
     const dateInput = document.getElementById('basic-datepicker');
     const params = new URLSearchParams(window.location.search);
@@ -153,5 +161,3 @@ document.getElementById('btn-edit-data').addEventListener('click', function() {
     window.location.href = url;
 });
 </script>
-
-@include('layout.footer')
