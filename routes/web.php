@@ -26,6 +26,7 @@ use App\Http\Controllers\MaintenanceTowerController;
 use App\Http\Controllers\MaintenanceUnitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RitationPerHourController;
+use App\Http\Controllers\SummaryRitationController;
 use App\Http\Controllers\WeeklyActivityController;
 use App\Http\Controllers\WeeklyPlanController;
 use Illuminate\Support\Facades\Route;
@@ -127,6 +128,9 @@ Route::group(['middleware' => ['auth']], function(){
 
     //Maintenance Unit
     Route::get('/maintenanceTower', [MaintenanceTowerController::class, 'index'])->name('maintenanceTower.index');
+
+    //Summary Ritation
+    Route::get('/summaryRitation', [SummaryRitationController::class, 'index'])->name('summaryRitation.index');
 
     //Activity Tower
     Route::get('/ritationPerHour', [RitationPerHourController::class, 'index'])->name('ritationPerHour.index');

@@ -134,6 +134,11 @@
                                 <span class="menu-text">Maintenance Unit</span>
                             </a>
                         </li>
+                        <li class="side-nav-item">
+                            <a href="{{ route('summaryRitation.index') }}" class="side-nav-link">
+                                <span class="menu-text">Summary Ritation</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

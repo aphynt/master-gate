@@ -10,9 +10,9 @@
             </div>
 
            <form action="" method="GET" class="d-flex align-items-center gap-2">
-    <input type="month" name="DATE_REPORT" class="form-control" required style="width: 160px;">
-    <button type="submit" class="btn btn-outline-primary">Show Report</button>
-</form>
+                <input type="month" name="DATE_REPORT" class="form-control" required style="width: 160px;">
+                <button type="submit" class="btn btn-outline-primary">Show Report</button>
+            </form>
             {{-- <div>
                 <a href="#" class="btn btn-primary waves-effect waves-light">
                     Export Excel
