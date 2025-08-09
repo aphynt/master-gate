@@ -51,6 +51,7 @@
                                     <th>Last Maintained</th>
                                     <th>Location</th>
                                     <th>Remarks</th>
+                                    <th>On-site</th>
                                     <th>Reporting</th>
                                 </tr>
                             </thead>
@@ -73,6 +74,7 @@
                                             <td>{{ $tower->LAST_MAINTAINED ? \Carbon\Carbon::parse($tower->LAST_MAINTAINED)->translatedFormat('F d, Y') : '' }}</td>
                                             <td>{{ $tower->LOCATION }}</td>
                                             <td>{{ $tower->REMARKS }}</td>
+                                            <td>{{ $tower->ACTION_BY }}</td>
                                             <td>{{ $tower->REPORTING }}</td>
                                         </tr>
                                     @endforeach

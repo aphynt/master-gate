@@ -10,9 +10,9 @@
             </div>
 
            <form action="" method="GET" class="d-flex align-items-center gap-2">
-    <input type="month" name="DATE_REPORT" class="form-control" required style="width: 160px;">
-    <button type="submit" class="btn btn-outline-primary">Show Report</button>
-</form>
+            <input type="month" name="DATE_REPORT" class="form-control" required style="width: 160px;">
+            <button type="submit" class="btn btn-outline-primary">Show Report</button>
+        </form>
             {{-- <div>
                 <a href="#" class="btn btn-primary waves-effect waves-light">
                     Export Excel
@@ -51,6 +51,7 @@
                                     <th>Last Maintained</th>
                                     <th>Location</th>
                                     <th>Remarks</th>
+                                    <th>On-site</th>
                                     <th>Reporting</th>
                                 </tr>
                             </thead>
@@ -73,6 +74,7 @@
                                             <td>{{ $unit->LAST_MAINTAINED ? \Carbon\Carbon::parse($unit->LAST_MAINTAINED)->translatedFormat('F d, Y') : '' }}</td>
                                             <td>{{ $unit->LOCATION }}</td>
                                             <td>{{ $unit->REMARKS }}</td>
+                                            <td>{{ $unit->ACTION_BY }}</td>
                                             <td>{{ $unit->REPORTING }}</td>
                                         </tr>
                                     @endforeach

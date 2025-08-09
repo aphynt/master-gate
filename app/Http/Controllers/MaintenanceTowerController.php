@@ -31,6 +31,22 @@ class MaintenanceTowerController extends Controller
             $nonMtStart = $carbonBulan->copy()->startOfMonth()->toDateString();
             $nonMtEnd = $carbonBulan->copy()->endOfMonth()->toDateString();
 
+            $users = DB::table('users')->pluck('name', 'nrp');
+
+            $convertPIC = function ($picString) use ($users) {
+                $nrps = explode(',', $picString);
+                $names = [];
+
+                foreach ($nrps as $nrp) {
+                    $nrp = trim($nrp);
+                    if (isset($users[$nrp])) {
+                        $names[] = $users[$nrp];
+                    }
+                }
+
+                return implode(', ', $names);
+            };
+
             $latestActivity = DB::table(DB::raw("
                 (
                     SELECT
@@ -40,6 +56,7 @@ class MaintenanceTowerController extends Controller
                         au.REMARKS,
                         au.REPORTING,
                         lu.TYPE,
+                        au.ACTION_BY as ACTION_BY,
                         ROW_NUMBER() OVER (
                             PARTITION BY au.UUID_TOWER
                             ORDER BY au.DATE_ACTION DESC, au.UUID DESC
@@ -75,11 +92,15 @@ class MaintenanceTowerController extends Controller
                     'latest.DATE_ACTION as LAST_MAINTAINED',
                     'lu.LOKASI as LOCATION',
                     'latest.REMARKS',
+                    'latest.ACTION_BY',
                     'us.name as REPORTING'
                 )
                 ->where('lu.STATUSENABLED', true)
                 ->orderBy('lu.NAMA')
-                ->get();
+                ->get()->map(function ($row) use ($convertPIC) {
+                $row->ACTION_BY = $row->ACTION_BY ? $convertPIC($row->ACTION_BY) : null;
+                return $row;
+            });
 
         return view('maintenanceTower.index', compact('activityTower'));
     }
