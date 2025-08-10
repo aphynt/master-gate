@@ -69,8 +69,11 @@
 <!--Morris Chart-->
 <script src="{{ asset('dashboard') }}/assets/libs/morris.js/morris.min.js"></script>
 <script src="{{ asset('dashboard') }}/assets/libs/raphael/raphael.min.js"></script>
+<!-- Apex Chart Bar Demo js -->
+<script src="{{ asset('dashboard') }}/assets/js/pages/morris.js"></script>
 <!-- Projects Analytics Dashboard App js -->
 <script src="{{ asset('dashboard') }}/assets/js/pages/dashboard-sales.js"></script>
+
 
 </body>
 
