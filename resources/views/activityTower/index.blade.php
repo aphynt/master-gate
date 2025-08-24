@@ -15,15 +15,19 @@
                     style="width: 160px;">
                 <button type="submit" class="btn btn-outline-primary">Show Report</button>
             </form>
-
+            <div>
+                <button id="btn-detail-data" class="btn btn-info waves-effect waves-light" type="button">
+                    Detail
+                </button>
+            </div>
             <div>
                 <button id="btn-edit-data" class="btn btn-purple waves-effect waves-light" type="button">
-                    Edit Data
+                    Edit
                 </button>
             </div>
             <div>
                 <a href="{{ route('activityTower.insert') }}" class="btn btn-primary waves-effect waves-light">
-                    Insert Data
+                    Insert
                 </a>
             </div>
         </div>
@@ -133,6 +137,25 @@ document.querySelectorAll('#datatable tbody tr').forEach(row => {
     });
 });
 
+document.getElementById('btn-detail-data').addEventListener('click', function() {
+    const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
+
+    if (checkedBoxes.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Upps...',
+            text: 'Pilih minimal satu data!',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    const uuids = Array.from(checkedBoxes).map(cb => cb.value);
+
+    const url = `{{ url('activityTower/detail') }}?ids=` + uuids.join(',');
+
+    window.location.href = url;
+});
 document.getElementById('btn-edit-data').addEventListener('click', function() {
     const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
 

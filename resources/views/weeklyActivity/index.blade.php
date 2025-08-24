@@ -10,7 +10,7 @@
             </div>
 
             <form action="" method="GET" class="d-flex align-items-center gap-2">
-                <input type="text" id="basic-datepicker" class="form-control" name="DATE_REPORT" required
+                <input type="text" id="basic-datepicker" class="form-control" name="DATE_REPORT"
                     style="width: 160px;" value="{{ request('DATE_REPORT') }}">
 
                 <button type="submit" name="action_type" value="show" class="btn btn-outline-primary">

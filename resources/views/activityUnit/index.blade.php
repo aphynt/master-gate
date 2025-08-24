@@ -1,7 +1,12 @@
 @include('layout.head', ['title' => 'Activity Unit'])
 @include('layout.sidebar')
 @include('layout.header')
+<style>
 
+.select2-container {
+  z-index: 9999 !important;
+}
+</style>
 <div class="page-container">
 
     <div class="page-title-box">
@@ -15,15 +20,19 @@
                     style="width: 160px;">
                 <button type="submit" class="btn btn-outline-primary">Show Report</button>
             </form>
-
+            <div>
+                <button id="btn-detail-data" class="btn btn-info waves-effect waves-light" type="button">
+                    Detail
+                </button>
+            </div>
             <div>
                 <button id="btn-edit-data" class="btn btn-purple waves-effect waves-light" type="button">
-                    Edit Data
+                    Edit
                 </button>
             </div>
             <div>
                 <a href="{{ route('activityUnit.insert') }}" class="btn btn-primary waves-effect waves-light">
-                    Insert Data
+                    Insert
                 </a>
             </div>
         </div>
@@ -69,7 +78,7 @@
                                     <td>{{ date('H:i', strtotime($unt->START)) }}</td>
                                     <td>{{ date('H:i', strtotime($unt->FINISH)) }}</td>
                                     <td>{{ $unt->NAMA_STATUS }}</td>
-                                    <td>{{ $unt->ACTION_BY }}</td>
+                                    <td>{{ $unt->ACTION }}</td>
                                     <td>{{ $unt->REMARKS }}</td>
                                     <td>{{ $unt->REPORTING }}</td>
                                     <td>
@@ -79,6 +88,12 @@
                                             data-plugin="custommodal" data-overlaySpeed="100"
                                             data-overlayColor="#36404a">Hapus</a>
                                             @include('activityUnit.modal.delete')
+
+                                            {{-- <a href="#editWorkerlistActivity{{ $unt->ID }}"
+                                            class="btn btn-warning waves-effect waves-light btn-sm" data-animation="blur"
+                                            data-plugin="custommodal" data-overlaySpeed="100"
+                                            data-overlayColor="#36404a">Edit Worker</a>
+                                            @include('activityUnit.modal.editWorker') --}}
                                         @endif
                                     </td>
                                 </tr>
@@ -94,13 +109,6 @@
 
 @include('layout.footer')
 <script>
-    $(document).ready(function () {
-        $('#datatable').DataTable({
-            pageLength: 50,
-            destroy: true
-        });
-    });
-
 document.addEventListener('DOMContentLoaded', function () {
     const dateInput = document.getElementById('basic-datepicker');
     const params = new URLSearchParams(window.location.search);
@@ -141,6 +149,26 @@ document.querySelectorAll('#datatable tbody tr').forEach(row => {
     });
 });
 
+document.getElementById('btn-detail-data').addEventListener('click', function() {
+    const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
+
+    if (checkedBoxes.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Upps...',
+            text: 'Pilih minimal satu data!',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    const uuids = Array.from(checkedBoxes).map(cb => cb.value);
+
+    const url = `{{ url('activityUnit/detail') }}?ids=` + uuids.join(',');
+
+    window.location.href = url;
+});
+
 document.getElementById('btn-edit-data').addEventListener('click', function() {
     const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
 
@@ -160,4 +188,5 @@ document.getElementById('btn-edit-data').addEventListener('click', function() {
 
     window.location.href = url;
 });
+
 </script>

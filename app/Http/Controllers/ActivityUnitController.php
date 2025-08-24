@@ -28,8 +28,23 @@ class ActivityUnitController extends Controller
         }else{
             $date = Carbon::today()->format('Y-m-d');
         }
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         $users = DB::table('users')->pluck('name', 'nrp');
+
+            $convertPIC = function ($picString) use ($users) {
+                $nrps = explode(',', $picString);
+                $names = [];
+
+                foreach ($nrps as $nrp) {
+                    $nrp = trim($nrp);
+                    if (isset($users[$nrp])) {
+                        $names[] = $users[$nrp];
+                    }
+                }
+
+                return implode(', ', $names);
+            };
 
         $unit = DB::table('activity_unit as un')
         ->leftJoin('list_unit as lt', 'un.UUID_UNIT', 'lt.UUID')
@@ -37,6 +52,7 @@ class ActivityUnitController extends Controller
         ->leftJoin('list_status as ls', 'un.UUID_STATUS', 'ls.UUID')
         ->leftJoin('users as us', 'un.REPORTING', 'us.nrp')
         ->select(
+            'un.ID',
             'un.UUID',
             'lt.VHC_ID as NAMA_UNIT',
             DB::raw("FORMAT(un.DATE_ACTION, 'yyyy-MM-dd') as DATE_ACTION"),
@@ -53,7 +69,10 @@ class ActivityUnitController extends Controller
         )
         ->where('un.STATUSENABLED', true)
         ->where('un.DATE_ACTION', $date)
-        ->get();
+        ->get()->map(function ($row) use ($convertPIC) {
+                $row->ACTION = $row->ACTION_BY ? $convertPIC($row->ACTION_BY) : null;
+                return $row;
+            });
         // dd($unit);
 
         foreach ($unit as $act) {
@@ -71,7 +90,25 @@ class ActivityUnitController extends Controller
         }
         // dd($unit);
 
-        return view('activityUnit.index', compact('unit'));
+        return view('activityUnit.index', compact('unit', 'user'));
+    }
+
+    public function updateWorker(Request $request, $uuid)
+    {
+         dd($request->all());
+
+        try {
+            ActivityUnit::where('UUID', $uuidActivity)->update([
+                'STATUSENABLED'  => true,
+                'ACTION_BY' => is_array($request->ACTION_BY) ? implode(',', $request->ACTION_BY) : $request->ACTION_BY,
+                'UPDATED_BY' => Auth::user()->nrp,
+                'UPDATED_AT' => now(),
+            ]);
+
+            return redirect()->route('activityGenset.index')->with('success', 'Data berhasil disimpan.');
+        } catch (\Throwable $th) {
+            return redirect()->route('activityGenset.index')->with('info', 'Gagal menyimpan data: ' . $th->getMessage());
+        }
     }
 
     public function insert()
@@ -250,6 +287,109 @@ class ActivityUnitController extends Controller
         }
 
 
+    }
+
+    public function detail(Request $request)
+    {
+        $idsString = $request->query('ids');
+
+        if (!$idsString) {
+            return redirect()->route('activityUnit.index')
+                ->with('error', 'Tidak ada data yang dipilih untuk diedit.');
+        }
+
+        $ids = explode(',', $idsString);
+
+        $users = DB::table('users')->pluck('nama_panggilan', 'nrp');
+        $unit = ListUnit::where('STATUSENABLED', true)->get();
+        $activity = ListActivity::where('STATUSENABLED', true)->get();
+        $reqBy = ListRequestAt::where('STATUSENABLED', true)->get();
+        $actual = ListDescriptionProblem::where('STATUSENABLED', true)->get();
+        $status = ListStatus::where('STATUSENABLED', true)->get();
+        $barang = Barang::where('STATUSENABLED', true)->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
+
+        $users = DB::table('users')->pluck('name', 'nrp');
+
+            $convertPIC = function ($picString) use ($users) {
+                $nrps = explode(',', $picString);
+                $names = [];
+
+                foreach ($nrps as $nrp) {
+                    $nrp = trim($nrp);
+                    if (isset($users[$nrp])) {
+                        $names[] = $users[$nrp];
+                    }
+                }
+
+                return implode(', ', $names);
+            };
+
+        $dailyUnit = DB::table('activity_unit as at')
+            ->leftJoin('list_unit as lt', 'at.UUID_UNIT', 'lt.UUID')
+            ->leftJoin('list_request_at as ra', 'at.UUID_REQUEST_BY', 'ra.UUID')
+            ->leftJoin('list_activity as la', 'at.UUID_ACTIVITY', 'la.UUID')
+            ->leftJoin('list_status as ls', 'at.UUID_STATUS', 'ls.UUID')
+            ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
+            ->select(
+                'at.UUID',
+                'lt.UUID as UUID_UNIT',
+                'lt.VHC_ID as NAMA_UNIT',
+                DB::raw("FORMAT(at.DATE_ACTION, 'yyyy-MM-dd') as DATE_REPORT"),
+                'ra.UUID as UUID_REQUEST_BY',
+                'ra.KETERANGAN as NAMA_REQUEST_BY',
+                'la.UUID as UUID_ACTIVITY',
+                'la.KETERANGAN as NAMA_ACTIVITY',
+                'at.ACTUAL_PROBLEM',
+                'at.ACTION_PROBLEM',
+                DB::raw("CONVERT(VARCHAR(5), at.START, 108) as START"),
+                DB::raw("CONVERT(VARCHAR(5), at.FINISH, 108) as FINISH"),
+                'ls.UUID as UUID_STATUS',
+                'ls.KETERANGAN as NAMA_STATUS',
+                'at.ACTION_BY',
+                'at.REMARKS',
+                'us.name as REPORTING',
+                'at.REPORTING as NRP_REPORTING',
+            )
+            ->whereIn('at.UUID', $ids)
+            ->where('at.STATUSENABLED', true)
+            ->get()->map(function ($row) use ($convertPIC) {
+                $row->ACTION_BY = $row->ACTION_BY ? $convertPIC($row->ACTION_BY) : null;
+                return $row;
+            });
+
+        if ($dailyUnit->isEmpty()) {
+            return redirect()->route('activityUnit.index')
+                ->with('error', 'Data yang dipilih tidak ditemukan.');
+        }
+
+        $activityUUIDs = $dailyUnit->pluck('UUID');
+
+        $barangKeluar = DB::table('log_barang_keluar as bk')
+        ->leftJoin('log_barang as br', 'bk.UUID_BARANG', 'br.UUID')
+        ->leftJoin('activity_unit as at', 'bk.UUID_ACTIVITY_UNIT', 'at.UUID')
+        ->leftJoin('list_unit as unt', 'at.UUID_UNIT', 'unt.UUID')
+        ->select(
+            'unt.UUID as UUID_UNIT',
+            'unt.VHC_ID as NAMA_UNIT',
+            'br.UUID as UUID_BARANG',
+            'br.ITEM as NAMA_BARANG',
+            'bk.JUMLAH',
+            'bk.STATUSENABLED'
+        )
+        ->whereIn('UUID_ACTIVITY_UNIT', $activityUUIDs)->where('bk.STATUSENABLED', true)->get();
+
+        $barangKeluar = $barangKeluar->map(function ($item) {
+        return [
+            'unit' => $item->NAMA_UNIT,
+            'item' => $item->NAMA_BARANG,
+            'qty' => $item->JUMLAH,
+            'unitUUID' => $item->UUID_UNIT,
+            'uuid' => $item->UUID_BARANG
+        ];
+    });
+
+        return view('activityUnit.detail', compact('dailyUnit', 'unit', 'user', 'activity', 'reqBy', 'actual', 'status', 'barang', 'barangKeluar'));
     }
 
     public function edit(Request $request)

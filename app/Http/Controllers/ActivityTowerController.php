@@ -249,13 +249,112 @@ class ActivityTowerController extends Controller
 
     }
 
+    public function detail(Request $request)
+    {
+        $idsString = $request->query('ids');
+
+        if (!$idsString) {
+            return redirect()->route('activityTower.index')
+                ->with('info', 'Tidak ada data yang dipilih untuk dilihat.');
+        }
+
+        $ids = explode(',', $idsString);
+
+        $users = DB::table('users')->pluck('nama_panggilan', 'nrp');
+        $tower = ListTower::where('STATUSENABLED', true)->get();
+        $activity = ListActivity::where('STATUSENABLED', true)->get();
+        $reqBy = ListRequestAt::where('STATUSENABLED', true)->get();
+        $actual = ListDescriptionProblem::where('STATUSENABLED', true)->get();
+        $status = ListStatus::where('STATUSENABLED', true)->get();
+        $barang = Barang::where('STATUSENABLED', true)->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
+        $users = DB::table('users')->pluck('name', 'nrp');
+
+            $convertPIC = function ($picString) use ($users) {
+                $nrps = explode(',', $picString);
+                $names = [];
+
+                foreach ($nrps as $nrp) {
+                    $nrp = trim($nrp);
+                    if (isset($users[$nrp])) {
+                        $names[] = $users[$nrp];
+                    }
+                }
+
+                return implode(', ', $names);
+            };
+
+        $dailyTower = DB::table('activity_tower as at')
+            ->leftJoin('list_tower as lt', 'at.UUID_TOWER', 'lt.UUID')
+            ->leftJoin('list_activity as la', 'at.UUID_ACTIVITY', 'la.UUID')
+            ->leftJoin('list_status as ls', 'at.UUID_STATUS', 'ls.UUID')
+            ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
+            ->select(
+                'at.UUID',
+                'lt.UUID as UUID_TOWER',
+                'lt.NAMA as NAMA_TOWER',
+                DB::raw("FORMAT(at.DATE_ACTION, 'yyyy-MM-dd') as DATE_REPORT"),
+                'la.UUID as UUID_ACTIVITY',
+                'la.KETERANGAN as NAMA_ACTIVITY',
+                'at.ACTUAL_PROBLEM',
+                'at.ACTION_PROBLEM',
+                DB::raw("CONVERT(VARCHAR(5), at.START, 108) as START"),
+                DB::raw("CONVERT(VARCHAR(5), at.FINISH, 108) as FINISH"),
+                'ls.UUID as UUID_STATUS',
+                'ls.KETERANGAN as NAMA_STATUS',
+                'at.ACTION_BY',
+                'at.REMARKS',
+                'us.name as REPORTING',
+                'at.REPORTING as NRP_REPORTING',
+            )
+            ->whereIn('at.UUID', $ids)
+            ->where('at.STATUSENABLED', true)
+            ->get()->map(function ($row) use ($convertPIC) {
+                $row->ACTION_BY = $row->ACTION_BY ? $convertPIC($row->ACTION_BY) : null;
+                return $row;
+            });
+
+        if ($dailyTower->isEmpty()) {
+            return redirect()->route('activityTower.index')
+                ->with('error', 'Data yang dipilih tidak ditemukan.');
+        }
+
+        $activityUUIDs = $dailyTower->pluck('UUID');
+
+        $barangKeluar = DB::table('log_barang_keluar as bk')
+        ->leftJoin('log_barang as br', 'bk.UUID_BARANG', 'br.UUID')
+        ->leftJoin('activity_tower as at', 'bk.UUID_ACTIVITY_TOWER', 'at.UUID')
+        ->leftJoin('list_tower as twr', 'at.UUID_TOWER', 'twr.UUID')
+        ->select(
+            'twr.UUID as UUID_TOWER',
+            'twr.NAMA as NAMA_TOWER',
+            'br.UUID as UUID_BARANG',
+            'br.ITEM as NAMA_BARANG',
+            'bk.JUMLAH',
+            'bk.STATUSENABLED'
+        )
+        ->whereIn('UUID_ACTIVITY_TOWER', $activityUUIDs)->where('bk.STATUSENABLED', true)->get();
+
+        $barangKeluar = $barangKeluar->map(function ($item) {
+        return [
+            'tower' => $item->NAMA_TOWER,
+            'item' => $item->NAMA_BARANG,
+            'qty' => $item->JUMLAH,
+            'towerUUID' => $item->UUID_TOWER,
+            'uuid' => $item->UUID_BARANG
+        ];
+    });
+
+        return view('activityTower.detail', compact('dailyTower', 'tower', 'user', 'activity', 'reqBy', 'actual', 'status', 'barang', 'barangKeluar'));
+    }
+
     public function edit(Request $request)
     {
         $idsString = $request->query('ids');
 
         if (!$idsString) {
             return redirect()->route('activityTower.index')
-                ->with('error', 'Tidak ada data yang dipilih untuk diedit.');
+                ->with('info', 'Tidak ada data yang dipilih untuk diedit.');
         }
 
         $ids = explode(',', $idsString);

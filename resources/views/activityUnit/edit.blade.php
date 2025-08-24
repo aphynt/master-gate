@@ -94,21 +94,22 @@
                                                 <td>
                                                     <input type="text" class="form-control basic-datepicker" name="data[{{ $i }}][DATE_REPORT]" value="{{ $un->DATE_REPORT }}" required>
                                                 </td>
-                                                <td>
-                                                    <select class="form-control" data-toggle="select2"
-                                                        name="data[{{ $i }}][UUID_REQUEST_BY]" required>
-                                                        <option value="{{ $un->UUID_REQUEST_BY }}">{{ $un->NAMA_REQUEST_BY }}</option>
-                                                        @foreach ($reqBy as $rby)
-                                                        <option value="{{ $rby->UUID }}">{{ $rby->KETERANGAN }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
+
                                                 <td>
                                                     <select class="form-control" data-toggle="select2"
                                                         name="data[{{ $i }}][UUID_ACTIVITY]" required>
                                                         <option value="{{ $un->UUID_ACTIVITY }}">{{ $un->NAMA_ACTIVITY }}</option>
                                                         @foreach ($activity as $act)
                                                         <option value="{{ $act->UUID }}">{{ $act->KETERANGAN }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" data-toggle="select2"
+                                                        name="data[{{ $i }}][UUID_REQUEST_BY]" required>
+                                                        <option value="{{ $un->UUID_REQUEST_BY }}">{{ $un->NAMA_REQUEST_BY }}</option>
+                                                        @foreach ($reqBy as $rby)
+                                                        <option value="{{ $rby->UUID }}">{{ $rby->KETERANGAN }}</option>
                                                         @endforeach
                                                     </select>
                                                 </td>

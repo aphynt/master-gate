@@ -16,7 +16,7 @@
             </form>
 
             <div>
-                <a href="{{ route('activityGenset.insert') }}" class="btn btn-primary waves-effect waves-light" >Tambah Data</a>
+                <a href="{{ route('activityGenset.insert') }}" class="btn btn-primary waves-effect waves-light" >Insert</a>
             </div>
         </div>
     </div>

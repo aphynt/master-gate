@@ -17,7 +17,7 @@
 
             <div>
                 <a href="{{ route('activityAdditional.insert') }}" class="btn btn-primary waves-effect waves-light">
-                    Insert Data
+                    Insert
                 </a>
             </div>
         </div>

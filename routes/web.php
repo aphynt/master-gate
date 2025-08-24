@@ -24,6 +24,7 @@ use App\Http\Controllers\ListTowerController;
 use App\Http\Controllers\ListUnitController;
 use App\Http\Controllers\MaintenanceTowerController;
 use App\Http\Controllers\MaintenanceUnitController;
+use App\Http\Controllers\MonthlyActivityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RitationPerHourController;
 use App\Http\Controllers\SummaryRitationController;
@@ -115,7 +116,7 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/weeklyActivity', [WeeklyActivityController::class, 'index'])->name('weeklyActivity.index');
 
     //Monthly Activity
-    Route::get('/monthlyActivity', [DailyActivityController::class, 'index'])->name('monthlyActivity.index');
+    Route::get('/monthlyActivity', [MonthlyActivityController::class, 'index'])->name('monthlyActivity.index');
 
     //Plan Weekly
     Route::get('/weeklyPlan', [WeeklyPlanController::class, 'index'])->name('weeklyPlan.index');
@@ -143,15 +144,19 @@ Route::group(['middleware' => ['auth']], function(){
     Route::post('/activityTower/post', [ActivityTowerController::class, 'post'])->name('activityTower.post');
     Route::post('/activityTower/update', [ActivityTowerController::class, 'update'])->name('activityTower.update');
     Route::get('/activityTower/edit', [ActivityTowerController::class, 'edit'])->name('activityTower.edit');
+    Route::get('/activityTower/detail', [ActivityTowerController::class, 'detail'])->name('activityTower.detail');
     Route::get('/activityTower/delete/{uuid}', [ActivityTowerController::class, 'delete'])->name('activityTower.delete');
+    Route::post('/activityTower/updateWorker/{uuid}', [ActivityTowerController::class, 'updateWorker'])->name('activityTower.updateWorker');
 
     //Activity Unit
     Route::get('/activityUnit', [ActivityUnitController::class, 'index'])->name('activityUnit.index');
     Route::get('/activityUnit/insert', [ActivityUnitController::class, 'insert'])->name('activityUnit.insert');
     Route::post('/activityUnit/post', [ActivityUnitController::class, 'post'])->name('activityUnit.post');
     Route::post('/activityUnit/update', [ActivityUnitController::class, 'update'])->name('activityUnit.update');
+    Route::get('/activityUnit/detail', [ActivityUnitController::class, 'detail'])->name('activityUnit.detail');
     Route::get('/activityUnit/edit', [ActivityUnitController::class, 'edit'])->name('activityUnit.edit');
     Route::get('/activityUnit/delete/{uuid}', [ActivityUnitController::class, 'delete'])->name('activityUnit.delete');
+    Route::post('/activityUnit/updateWorker/{uuid}', [ActivityUnitController::class, 'updateWorker'])->name('activityUnit.updateWorker');
 
     //Activity Genset
     Route::get('/activityGenset', [ActivityGensetController::class, 'index'])->name('activityGenset.index');
