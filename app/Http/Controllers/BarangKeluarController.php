@@ -21,6 +21,10 @@ class BarangKeluarController extends Controller
         $barangKeluar = DB::table('log_barang_keluar as bk')
         ->leftJoin('log_barang as br', 'bk.UUID_BARANG', 'br.UUID')
         ->leftJoin('users as us', 'bk.REPORTING', 'us.nrp')
+        ->leftJoin('ACTIVITY_UNIT as au', 'bk.UUID_ACTIVITY_UNIT', 'au.UUID')
+        ->leftJoin('LIST_UNIT as lu', 'au.UUID_UNIT', 'lu.UUID')
+        ->leftJoin('ACTIVITY_TOWER as at', 'bk.UUID_ACTIVITY_TOWER', 'at.UUID')
+        ->leftJoin('LIST_TOWER as lt', 'at.UUID_TOWER', 'lt.UUID')
         ->select(
             'bk.UUID',
             'br.ITEM as NAMA_BARANG',
@@ -30,6 +34,15 @@ class BarangKeluarController extends Controller
             'bk.KETERANGAN',
             'bk.REPORTING as NRP_REPORTING',
             'us.name as NAMA_REPORTING',
+            'bk.UUID_ACTIVITY_UNIT',
+            'bk.UUID_ACTIVITY_TOWER',
+            DB::raw("
+            CASE
+                WHEN bk.UUID_ACTIVITY_UNIT IS NOT NULL THEN lu.VHC_ID
+                WHEN bk.UUID_ACTIVITY_TOWER IS NOT NULL THEN lt.NAMA
+                ELSE NULL
+            END as PENGGUNAAN
+        ")
         )->where('bk.STATUSENABLED', true)->get();
 
         foreach ($barangKeluar as $brm) {

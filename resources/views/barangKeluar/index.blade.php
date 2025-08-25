@@ -26,9 +26,10 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th data-priority="1">NAMA BARANG</th>
                                 <th data-priority="1">TANGGAL KELUAR</th>
+                                <th data-priority="1">NAMA BARANG</th>
                                 <th data-priority="1">JUMLAH</th>
+                                <th data-priority="1">PEMAKAIAN</th>
                                 <th data-priority="1">PIC</th>
                                 <th data-priority="1">KETERANGAN</th>
                                 <th data-priority="1">REPORTING</th>
@@ -39,9 +40,10 @@
                             @foreach ($barangKeluar as $brm)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $brm->NAMA_BARANG }}</td>
                                 <td>{{ \Carbon\Carbon::parse($brm->TANGGAL_KELUAR)->format('Y-m-d') }}</td>
+                                <td>{{ $brm->NAMA_BARANG }}</td>
                                 <td style="text-align: center">{{ $brm->JUMLAH }}</td>
+                                <td>{{ $brm->PENGGUNAAN }}</td>
                                 <td>{{ $brm->PIC }}</td>
                                 <td>{{ $brm->KETERANGAN }}</td>
                                 <td>{{ $brm->NAMA_REPORTING }}</td>
