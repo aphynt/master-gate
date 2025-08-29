@@ -42,6 +42,7 @@
                                     <th style="text-align: left;">Ritasi Total</th>
                                     <th style="text-align: left;">Ritasi Realtime</th>
                                     <th style="text-align: left;">Ritasi Not Realtime</th>
+                                    <th style="text-align: left;">Status Produksi</th>
                                     <th style="text-align: left;">Ach</th>
                                     <th style="text-align: left; min-width: 500px;">Information</th>
                                 </tr>
@@ -94,6 +95,7 @@
                                         <td>{{ $total }}</td>
                                         <td>{{ $realtime }}</td>
                                         <td>{{ $notRealtime }}</td>
+                                        <td>{{ $final['STATUS_PRODUKSI'] }}</td>
                                         <td style="{{ $ach > 0 && $ach < 95.0 ? 'color: red;' : '' }}">{{ number_format($ach, 1) }}%</td>
                                         <td>{{ $final['INFORMATION'] }}</td>
                                     </tr>
@@ -102,7 +104,7 @@
 
                             <tfoot>
                                 <tr style="background-color: #d0ebff;">
-                                    <th colspan="2" style="text-align: right">Siang</th>
+                                    <th colspan="3" style="text-align: right">Siang</th>
                                     <th>{{ $sumTotalSiang }}</th>
                                     <th>{{ $sumRealtimeSiang }}</th>
                                     <th>{{ $sumNotRealtimeSiang }}</th>
@@ -112,7 +114,7 @@
                                     <th></th>
                                 </tr>
                                 <tr style="background-color: #dcdcdc;">
-                                    <th colspan="2" style="text-align: right">Malam</th>
+                                    <th colspan="3" style="text-align: right">Malam</th>
                                     <th>{{ $sumTotalMalam }}</th>
                                     <th>{{ $sumRealtimeMalam }}</th>
                                     <th>{{ $sumNotRealtimeMalam }}</th>
@@ -122,7 +124,7 @@
                                     <th></th>
                                 </tr>
                                 <tr style="background-color: #d4edda;">
-                                    <th colspan="2" style="text-align: right">Grand Total</th>
+                                    <th colspan="3" style="text-align: right">Grand Total</th>
                                     <th>{{ $sumTotal }}</th>
                                     <th>{{ $sumRealtime }}</th>
                                     <th>{{ $sumNotRealtime }}</th>

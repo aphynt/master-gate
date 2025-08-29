@@ -25,34 +25,57 @@ class RitationPerHourController extends Controller
             'SET NOCOUNT ON; EXEC FOCUS_REPORTING.dbo.APP_RATE_PER_HOUR_RESUMEDATA @DATE = ?',
             [$date]
         );
+        $statusPerHour = DB::connection('focus_reporting')
+            ->table('PERIODIC.MODUS_STATUS_PER_HOUR as A')
+            ->leftJoin('focus.dbo.FLT_VSASTATUS as B', 'A.STATUS_MODUS', '=', 'B.VSA_STATUSID')
+            ->select(
+                'A.ID',
+                'A.DATE',
+                'A.HOUR',
+                'A.VHC_TYPE',
+                'A.VHC_ID',
+                'A.STATUS_MODUS',
+                'B.VSA_STATUSDESC',
+                'A.DURATION',
+                'A.CREATED_AT'
+            )
+            ->where('A.DATE', $date)
+            ->orderByDesc('A.DATE')
+            ->get();
+
         $ritationPerHourFocus = collect($ritationPerHourFocus);
 
         $finalRitation = collect();
 
         foreach ($ritationPerHourFocus as $focus) {
             $code = $focus->CODE;
+            $rangeHour = $focus->RANGEJAM;
 
             $matched = $ritationPerHour->firstWhere('CODE', $code);
 
-            if ($matched) {
-                $finalRitation->push([
-                    'CODE'   => $focus->CODE,
-                    'RANGEHOUR'   => $focus->RANGEJAM,
-                    'DATE_REPORT' => $focus->DATE,
-                    'TOTAL'       => $focus->N_RATEFMS,
-                    'REALTIME'    => $focus->N_RIT_REALTIME,
-                    'INFORMATION' => $matched->INFORMATION,
-                ]);
-            } else {
-                $finalRitation->push([
-                    'CODE'   => $focus->CODE,
-                    'RANGEHOUR'   => $focus->RANGEJAM,
-                    'DATE_REPORT' => $focus->DATE,
-                    'TOTAL'       => $focus->N_RATEFMS,
-                    'REALTIME'    => $focus->N_RIT_REALTIME,
-                    'INFORMATION' => null,
-                ]);
-            }
+            [$startHour, $endHour] = explode('-', $rangeHour);
+            $hourInt = (int) explode(':', $startHour)[0];
+
+            $statusGroup = $statusPerHour->where('HOUR', $hourInt);
+
+            $dominant = $statusGroup
+                ->groupBy('VSA_STATUSDESC')
+                ->map(function ($items) {
+                    return $items->sum('DURATION'); // total durasi
+                })
+                ->sortDesc()
+                ->keys()
+                ->first();
+
+            $finalRitation->push([
+                'CODE'           => $focus->CODE,
+                'RANGEHOUR'      => $focus->RANGEJAM,
+                'DATE_REPORT'    => $focus->DATE,
+                'TOTAL'          => $focus->N_RATEFMS,
+                'REALTIME'       => $focus->N_RIT_REALTIME,
+                'INFORMATION'    => $matched->INFORMATION ?? null,
+                'STATUS_PRODUKSI'=> $dominant,
+            ]);
         }
 
         return view('ritationPerHour.index', compact('finalRitation'));

@@ -123,6 +123,18 @@ return [
             'prefix_indexes' => true,
             'trust_server_certificate' => true,
         ],
+        'focus_reporting' => [
+            'driver' => 'sqlsrv',
+            'host' => '10.10.3.73',
+            'port' => '1433',
+            'database' => 'FOCUS_REPORTING',
+            'username' => 'focus',
+            'password' => 'sim5_db@1234',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'trust_server_certificate' => true,
+        ],
     ],
 
     /*
