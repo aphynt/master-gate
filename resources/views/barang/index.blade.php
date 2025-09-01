@@ -34,7 +34,7 @@
                                 <th data-priority="1">ITEM</th>
                                 <th data-priority="1">DESCRIPTION</th>
                                 <th data-priority="1">STATUS</th>
-                                <th data-priority="1">STOK AWAL 2025</th>
+                                <th data-priority="1">STOK AWAL AGUSTUS 2025</th>
                                 <th data-priority="1">STOK AKHIR</th>
                                 <th data-priority="6">AKSI</th>
                             </tr>
@@ -43,7 +43,20 @@
                            @foreach ($barang as $brg)
                             @php
                                 $masuk = $barangMasuk[$brg->UUID]->total_masuk ?? 0;
-                                $keluar = $barangKeluar[$brg->UUID]->total_keluar ?? 0;
+
+                                // ambil data keluar
+                                $keluarData = $barangKeluar[$brg->UUID] ?? null;
+
+                                // default keluar = 0
+                                $keluar = 0;
+
+                                if ($keluarData) {
+                                    // hanya hitung kalau minimal salah satu UUID_ACTIVITY tidak null
+                                    if ($keluarData->UUID_ACTIVITY_TOWER || $keluarData->UUID_ACTIVITY_UNIT || $keluarData->UUID_ACTIVITY_ADDITIONAL) {
+                                        $keluar = $keluarData->total_keluar ?? 0;
+                                    }
+                                }
+
                                 $stokAwal = $brg->STOK_AKHIR ?? 0;
                                 $stokAkhir = $stokAwal + $masuk - $keluar;
                             @endphp
