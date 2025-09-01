@@ -25,12 +25,12 @@ class BarangController extends Controller
 
 
 
-        $barangKeluar = DB::table('LOG_BARANG_KELUAR')
-        ->select('UUID_BARANG', DB::raw('SUM(JUMLAH) as total_keluar'), 'UUID_ACTIVITY_TOWER', 'UUID_ACTIVITY_UNIT', 'UUID_ACTIVITY_ADDITIONAL', 'STATUS')
+        $barangKeluar = DB::table('LOG_BARANG_KELUAR as bk')->leftJoin('LOG_BARANG as brg', 'bk.UUID_BARANG', 'brg.UUID')
+        ->select('bk.UUID_BARANG', DB::raw('SUM(bk.JUMLAH) as total_keluar'), 'bk.UUID_ACTIVITY_TOWER', 'bk.UUID_ACTIVITY_UNIT', 'bk.UUID_ACTIVITY_ADDITIONAL', 'brg.STATUS')
         ->where('STATUSENABLED', true)
-        ->groupBy('UUID_BARANG', 'UUID_ACTIVITY_TOWER', 'UUID_ACTIVITY_UNIT', 'UUID_ACTIVITY_ADDITIONAL', 'STATUS')
+        ->groupBy('bk.UUID_BARANG', 'bk.UUID_ACTIVITY_TOWER', 'bk.UUID_ACTIVITY_UNIT', 'bk.UUID_ACTIVITY_ADDITIONAL', 'brg.STATUS')
         ->get()
-        ->keyBy('UUID_BARANG');
+        ->keyBy('bk.UUID_BARANG');
 
 
         return view('barang.index', compact('barang', 'barangMasuk', 'barangKeluar'));
