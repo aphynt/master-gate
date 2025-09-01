@@ -52,7 +52,14 @@
 
                                 if ($keluarData) {
                                     // hanya hitung kalau minimal salah satu UUID_ACTIVITY tidak null
-                                    if ($keluarData->UUID_ACTIVITY_TOWER || $keluarData->UUID_ACTIVITY_UNIT || $keluarData->UUID_ACTIVITY_ADDITIONAL) {
+                                    if (
+                                        $brg->STATUS === 'Consumable' &&
+                                        (
+                                            $keluarData->UUID_ACTIVITY_TOWER
+                                            || $keluarData->UUID_ACTIVITY_UNIT
+                                            || $keluarData->UUID_ACTIVITY_ADDITIONAL
+                                        )
+                                    ) {
                                         $keluar = $keluarData->total_keluar ?? 0;
                                     }
                                 }
