@@ -1,4 +1,4 @@
-@include('layout.head', ['title' => 'Summary Monthly'])
+@include('layout.head', ['title' => 'Monthly Summary'])
 @include('layout.sidebar')
 @include('layout.header')
 <div class="page-container">
@@ -10,7 +10,7 @@
                     use Illuminate\Support\Carbon;
                     $tanggal = request('DATE_REPORT') ?? Carbon::today()->format('Y-m');
                     @endphp
-                <h4 class="font-18 mb-0">Summary Monthly {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('F Y') }}</h4>
+                <h4 class="font-18 mb-0">Monthly Summary {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('F Y') }}</h4>
             </div>
 
             <form action="" method="GET" class="d-flex align-items-center gap-2">

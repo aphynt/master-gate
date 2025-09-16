@@ -56,8 +56,8 @@
                                 <td>{{ $stokAwal }}</td>
                                 <td>@if ($brg->STATUS != 'Consumable')
                                         {{ $stokAkhir }}
-                                @endif
-                            </td>
+                                    @endif
+                                </td>
                                 <td>
                                     @if ($brg->ADD_BY == Auth::user()->nrp)
                                     <a href="#deleteBarang{{ $brg->UUID }}" class="btn btn-danger btn-sm"

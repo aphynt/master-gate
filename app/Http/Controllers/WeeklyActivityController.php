@@ -145,7 +145,7 @@ class WeeklyActivityController extends Controller
             ->sortBy(function ($item) use ($teamOrder) {
                 $teamIndex = array_search($item->TEAM, $teamOrder);
                 $teamIndex = $teamIndex === false ? PHP_INT_MAX : $teamIndex;
-                return sprintf('%03d-%s', $teamIndex, $item->START);
+                return sprintf('%03d-%s', $teamIndex, $item->DATE_REPORT);
             })
             ->values();
 
@@ -153,6 +153,7 @@ class WeeklyActivityController extends Controller
                 'monthlyActivity' => $monthlyActivity,
                 'weeklyActivity' => $weekly,
             ];
+
 
             if ($action === 'export') {
             return Excel::download(new SummaryWeeklyExport($monthlyActivity, $weekly, $tanggal, $startDate, $endDateMingguDepan), 'Weekly Activity dan Plan ' . Carbon::parse($startDate)->translatedFormat('d F Y') . ' - ' . Carbon::parse($endDateMingguDepan)->translatedFormat('d F Y') .'.xlsx');

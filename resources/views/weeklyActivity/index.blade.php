@@ -1,4 +1,4 @@
-@include('layout.head', ['title' => 'Summary Weekly'])
+@include('layout.head', ['title' => 'Weekly Summary'])
 @include('layout.sidebar')
 @include('layout.header')
 <div class="page-container">
@@ -6,7 +6,7 @@
     <div class="page-title-box">
         <div class="d-flex align-items-center flex-wrap gap-2">
             <div class="flex-grow-1">
-                <h4 class="font-18 mb-0">Summary Weekly</h4>
+                <h4 class="font-18 mb-0">Weekly Summary</h4>
             </div>
 
             <form action="" method="GET" class="d-flex align-items-center gap-2">

@@ -57,7 +57,7 @@
                                                     <td><textarea class="form-control form-control-sm" style="min-width: 300px;" name="data[0][WORK_ITEMS]" ></textarea>
                                                     </td>
                                                     <td>
-                                                        <select class="form-control select2-multiple" data-toggle="select2" multiple="multiple" name="data[0][ACTION_BY][]" data-placeholder="Choose ...">
+                                                        <select class="form-control select2-multiple" data-toggle="select2" multiple="multiple" name="data[0][ACTION_BY][]" data-placeholder="Choose ..." required>
                                                             @foreach ($user as $us)
                                                             <option value="{{ $us->NRP }}">{{ $us->NAMA_PANGGILAN }}
                                                             </option>
@@ -133,7 +133,7 @@
                 <td><textarea class="form-control form-control-sm" style="min-width: 300px;" name="data[${rowIndex}][WORK_ITEMS]" ></textarea>
                 </td>
                 <td>
-                    <select class="form-control select2-multiple" data-toggle="select2" multiple="multiple" name="data[${rowIndex}][ACTION_BY][]" data-placeholder="Choose ...">
+                    <select class="form-control select2-multiple" data-toggle="select2" multiple="multiple" name="data[${rowIndex}][ACTION_BY][]" data-placeholder="Choose ..." required>
                         @foreach ($user as $us)
                         <option value="{{ $us->NRP }}">{{ $us->NAMA_PANGGILAN }}
                         </option>

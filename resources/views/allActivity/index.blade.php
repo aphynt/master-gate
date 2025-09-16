@@ -43,8 +43,9 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Team</th>
-                                    <th>Jam Action</th>
-                                    <th>Jam Finish</th>
+                                    <th>Date Report</th>
+                                    <th>Time Action</th>
+                                    <th>Time Finish</th>
                                     <th>Activity</th>
                                     <th>On-site</th>
                                     <th>Reporting</th>
@@ -53,12 +54,13 @@
                             <tbody>
                                 @foreach ($grouped as $team => $activities)
                                     <tr class="table-secondary">
-                                        <td colspan="7"><strong>{{ $team }}</strong></td>
+                                        <td colspan="8"><strong>{{ $team }}</strong></td>
                                     </tr>
                                     @foreach ($activities as $daily)
                                         <tr>
                                             <td>{{ $no++ }}</td>
                                             <td>{{ $daily->TEAM }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($daily->DATE_REPORT)->format('d M Y') }}</td>
                                             <td>{{ \Carbon\Carbon::parse($daily->START)->format('H:i') }}</td>
                                             <td>{{ \Carbon\Carbon::parse($daily->FINISH)->format('H:i') }}</td>
                                             <td>{{ $daily->ACTIVITY }}</td>

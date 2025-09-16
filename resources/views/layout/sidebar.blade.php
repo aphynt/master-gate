@@ -109,19 +109,24 @@
                 </a>
                 <div class="collapse" id="summaryReport">
                     <ul class="sub-menu">
+                        {{-- <li class="side-nav-item">
+                            <a href="{{ route('allActivity.index') }}" class="side-nav-link">
+                                <span class="menu-text">All Summary</span>
+                            </a>
+                        </li> --}}
                         <li class="side-nav-item">
                             <a href="{{ route('dailyActivity.index') }}" class="side-nav-link">
-                                <span class="menu-text">Summary Daily</span>
+                                <span class="menu-text">Daily Summary</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
                             <a href="{{ route('weeklyActivity.index') }}" class="side-nav-link">
-                                <span class="menu-text">Summary Weekly</span>
+                                <span class="menu-text">Weekly Summary</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
                             <a href="{{ route('monthlyActivity.index') }}" class="side-nav-link">
-                                <span class="menu-text">Summary Monthly</span>
+                                <span class="menu-text">Monthly Summary</span>
                             </a>
                         </li>
                         <li class="side-nav-item">

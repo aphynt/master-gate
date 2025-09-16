@@ -7,6 +7,7 @@ use App\Http\Controllers\ActivityHarianUnitController;
 use App\Http\Controllers\ActivityPergantianBarangController;
 use App\Http\Controllers\ActivityTowerController;
 use App\Http\Controllers\ActivityUnitController;
+use App\Http\Controllers\AllActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
@@ -108,6 +109,9 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/inventory/outgoing/delete/{uuid}', [BarangKeluarController::class, 'delete'])->name('barangKeluar.delete');
     Route::get('/inventory/outgoing/edit/{uuid}', [BarangKeluarController::class, 'edit'])->name('barangKeluar.edit');
     Route::post('/inventory/outgoing/update/{uuid}', [BarangKeluarController::class, 'update'])->name('barangKeluar.update');
+
+    //All Activity
+    Route::get('/allActivity', [AllActivityController::class, 'index'])->name('allActivity.index');
 
     //Daily Activity
     Route::get('/dailyActivity', [DailyActivityController::class, 'index'])->name('dailyActivity.index');

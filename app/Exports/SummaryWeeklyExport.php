@@ -138,7 +138,7 @@ class SummaryWeeklyExport implements FromCollection, WithEvents, WithStyles, Wit
                             }
                         }
 
-                $grouped = $grouped->sortBy('DATE_REPORT')->values();
+                // $grouped = $grouped->sortBy('DATE_REPORT')->values();
                 $groupedByTeam = $grouped->groupBy('TEAM');
                 $yellowColor = 'FFFACD';
                 $highlightTime = Carbon::parse('16:30');
@@ -154,7 +154,13 @@ class SummaryWeeklyExport implements FromCollection, WithEvents, WithStyles, Wit
                         $sheet->setCellValue("C{$row}", $team);
 
                         // Weekly Plan
-                        $sheet->setCellValue("D{$row}", '(' . Carbon::parse($daily['DATE_REPORT'])->translatedFormat('d F Y') . ') ' . $daily['ACTIVITY']);
+                        if (!empty($daily['DATE_REPORT'])) {
+                            $dateText = '(' . Carbon::parse($daily['DATE_REPORT'])->translatedFormat('d F Y') . ') ';
+                        } else {
+                            $dateText = '';
+                        }
+
+                        $sheet->setCellValue("D{$row}", $dateText . $daily['ACTIVITY']);
                         $sheet->setCellValue("E{$row}", $daily['PIC_ACTIVITY']);
 
                         // Monthly Plan
@@ -163,10 +169,14 @@ class SummaryWeeklyExport implements FromCollection, WithEvents, WithStyles, Wit
 
                         // Highlight baris jika waktu laporan lebih dari jam 16:30
                         $reportDate = Carbon::parse($daily['DATE_REPORT']);
-                        if ($reportDate->format('H:i') > $highlightTime->format('H:i')) {
-                            $sheet->getStyle("A{$row}:G{$row}")->getFill()
-                                ->setFillType('solid')
-                                ->getStartColor()->setRGB($yellowColor);
+                        if (!empty($daily['DATE_REPORT'])) {
+                            $reportDate = Carbon::parse($daily['DATE_REPORT']);
+
+                            if ($reportDate->format('H:i') > $highlightTime->format('H:i')) {
+                                $sheet->getStyle("A{$row}:G{$row}")->getFill()
+                                    ->setFillType('solid')
+                                    ->getStartColor()->setRGB($yellowColor);
+                            }
                         }
 
                         $row++;
