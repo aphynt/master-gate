@@ -68,6 +68,29 @@ class WeeklyActivityController extends Controller
                 return $row;
             });
 
+        $additional = DB::table('activity_additional as add')
+            ->leftJoin('list_team as team', 'add.UUID_TEAM', 'team.UUID')
+            ->leftJoin('users as us', 'add.REPORTING', 'us.nrp')
+            ->select(
+                'add.UUID',
+                'add.STATUSENABLED',
+                'add.START',
+                'add.FINISH',
+                'add.ACTION_PROBLEM as ACTIVITY',
+                'add.ACTION_BY as PIC',
+                'us.name as REPORTING',
+                'add.DATE_REPORT',
+                'team.NAMA as TEAM',
+            )
+            ->where('add.STATUSENABLED', true)
+            ->whereBetween('add.DATE_REPORT', [$startDate, $endDate])
+            ->get()
+            ->map(function ($act) use ($convertPIC) {
+                $act->PIC = $convertPIC($act->PIC);
+                return $act;
+            });
+
+
         $tower = DB::table('activity_tower as at')
             ->leftJoin('LIST_TOWER as lt', 'at.UUID_TOWER', 'lt.UUID')
             ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
@@ -136,12 +159,13 @@ class WeeklyActivityController extends Controller
                 return $act;
             });
 
-        $teamOrder = ['All Team', 'Tower', 'Unit'];
+        $teamOrder = ['Tower', 'Unit', 'All Team'];
 
         $monthlyActivity = collect()
             ->merge($tower)
             ->merge($unit)
             ->merge($genset)
+            ->merge($additional)
             ->sortBy(function ($item) use ($teamOrder) {
                 $teamIndex = array_search($item->TEAM, $teamOrder);
                 $teamIndex = $teamIndex === false ? PHP_INT_MAX : $teamIndex;

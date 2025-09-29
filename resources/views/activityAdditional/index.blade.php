@@ -55,6 +55,12 @@
                                 <td>{{ $act->REPORTING }}</td>
                                 <td>
                                     @if (Auth::user()->nrp == $act->NRP_REPORTING)
+                                        {{-- <a href="#editOnsite{{ $act->UUID }}"
+                                        class="btn btn-dark waves-effect waves-light btn-sm" data-animation="contentscale"
+                                        data-plugin="custommodal" data-overlaySpeed="100"
+                                        data-overlayColor="#36404a">Update On-site</a>
+                                        @include('activityAdditional.modal.onsite') --}}
+
                                         <a href="#editlistActivity{{ $act->UUID }}"
                                         class="btn btn-purple waves-effect waves-light btn-sm" data-animation="contentscale"
                                         data-plugin="custommodal" data-overlaySpeed="100"

@@ -24,6 +24,8 @@ class ActivityAdditionalController extends Controller
 
         $users = DB::table('users')->pluck('name', 'nrp');
 
+        $pengguna = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
+
         $team = ListTeam::where('STATUSENABLED', true)->get();
 
         $activity = DB::table('activity_additional as add')
@@ -61,7 +63,7 @@ class ActivityAdditionalController extends Controller
             $act->ACTION_BY = implode(', ', $names);
         }
 
-        return view('activityAdditional.index', compact('activity', 'team'));
+        return view('activityAdditional.index', compact('activity', 'team', 'pengguna'));
     }
 
     public function insert()
