@@ -104,30 +104,33 @@
 
                             <tfoot>
                                 <tr style="background-color: #d0ebff;">
-                                    <th colspan="3" style="text-align: right">Siang</th>
+                                    <th colspan="2" style="text-align: right">Siang</th>
                                     <th>{{ $sumTotalSiang }}</th>
                                     <th>{{ $sumRealtimeSiang }}</th>
                                     <th>{{ $sumNotRealtimeSiang }}</th>
+                                    <th></th>
                                     <th style="text-align: left">
                                         {{ $sumTotalSiang > 0 ? number_format($sumRealtimeSiang / $sumTotalSiang * 100, 1) . '%' : '0%' }}
                                     </th>
                                     <th></th>
                                 </tr>
                                 <tr style="background-color: #dcdcdc;">
-                                    <th colspan="3" style="text-align: right">Malam</th>
+                                    <th colspan="2" style="text-align: right">Malam</th>
                                     <th>{{ $sumTotalMalam }}</th>
                                     <th>{{ $sumRealtimeMalam }}</th>
                                     <th>{{ $sumNotRealtimeMalam }}</th>
+                                    <th></th>
                                     <th style="text-align: left">
                                         {{ $sumTotalMalam > 0 ? number_format($sumRealtimeMalam / $sumTotalMalam * 100, 1) . '%' : '0%' }}
                                     </th>
                                     <th></th>
                                 </tr>
                                 <tr style="background-color: #d4edda;">
-                                    <th colspan="3" style="text-align: right">Grand Total</th>
+                                    <th colspan="2" style="text-align: right">Grand Total</th>
                                     <th>{{ $sumTotal }}</th>
                                     <th>{{ $sumRealtime }}</th>
                                     <th>{{ $sumNotRealtime }}</th>
+                                    <th></th>
                                     <th style="text-align: left">
                                         {{ $sumTotal > 0 ? number_format($sumRealtime / $sumTotal * 100, 1) . '%' : '0%' }}
                                     </th>
