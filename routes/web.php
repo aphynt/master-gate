@@ -112,6 +112,7 @@ Route::group(['middleware' => ['auth']], function(){
 
     //All Activity
     Route::get('/allActivity', [AllActivityController::class, 'index'])->name('allActivity.index');
+    Route::get('/allActivity/api', [AllActivityController::class, 'api'])->name('allActivity.api');
 
     //Daily Activity
     Route::get('/dailyActivity', [DailyActivityController::class, 'index'])->name('dailyActivity.index');

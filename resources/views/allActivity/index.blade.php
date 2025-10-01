@@ -1,4 +1,4 @@
-@include('layout.head', ['title' => 'Daily Summary'])
+@include('layout.head', ['title' => 'All Summary'])
 @include('layout.sidebar')
 @include('layout.header')
 <div class="page-container">
@@ -6,79 +6,41 @@
     <div class="page-title-box">
         <div class="d-flex align-items-center flex-wrap gap-2">
             <div class="flex-grow-1">
-                <h4 class="font-18 mb-0">Daily Summary</h4>
+                <h4 class="font-18 mb-0">All Summary</h4>
             </div>
-
-            <form action="" method="GET" class="d-flex align-items-center gap-2">
-                <input type="text" id="basic-datepicker" class="form-control" name="DATE_REPORT" required
-                    style="width: 160px;" value="{{ request('DATE_REPORT') }}">
-
-                <button type="submit" name="action_type" value="show" class="btn btn-outline-primary">
-                    Show Report
-                </button>
-
-                <button type="submit" name="action_type" value="export" class="btn btn-primary waves-effect waves-light">
-                    Export Excel
-                </button>
-            </form>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body pt-2">
-                    @php
-                        use Illuminate\Support\Carbon;
-                        $tanggal = request('DATE_REPORT') ?? Carbon::today()->format('Y-m-d');
-                        $grouped = collect($data['dailyActivity'])->groupBy('TEAM');
-                        $no = 1;
-                    @endphp
-
-                    <h4>Tanggal Laporan: {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover nowrap w-100">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Team</th>
-                                    <th>Date Report</th>
-                                    <th>Time Action</th>
-                                    <th>Time Finish</th>
-                                    <th>Activity</th>
-                                    <th>On-site</th>
-                                    <th>Reporting</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($grouped as $team => $activities)
-                                    <tr class="table-secondary">
-                                        <td colspan="8"><strong>{{ $team }}</strong></td>
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="dt-responsive table-responsive">
+                            <table id="allSummary" class="table table-striped table-hover table-bordered nowrap">
+                                <thead style="text-align: center; vertical-align: middle;">
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Team</th>
+                                        <th>Activity</th>
+                                        <th>Start</th>
+                                        <th>Finish</th>
+                                        <th>On-site</th>
+                                        <th>Reporting</th>
                                     </tr>
-                                    @foreach ($activities as $daily)
-                                        <tr>
-                                            <td>{{ $no++ }}</td>
-                                            <td>{{ $daily->TEAM }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($daily->DATE_REPORT)->format('d M Y') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($daily->START)->format('H:i') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($daily->FINISH)->format('H:i') }}</td>
-                                            <td>{{ $daily->ACTIVITY }}</td>
-                                            <td>{{ $daily->PIC }}</td>
-                                            <td>{{ $daily->REPORTING }}</td>
-                                        </tr>
-                                    @endforeach
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody id="tableBody">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
-    </div>
 
 </div>
+
+
+@include('layout.footer')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const dateInput = document.getElementById('basic-datepicker');
@@ -101,9 +63,67 @@
                 day: '2-digit'
             }).format(now);
 
-            dateInput.value = makassarDate; // Output format: YYYY-MM-DD
+            dateInput.value = makassarDate;
         }
     });
 </script>
 
-@include('layout.footer')
+<script>
+    $(document).ready(function() {
+        var userRole = "{{ Auth::user()->role }}";
+        var table = $('#allSummary').DataTable({
+
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('allActivity.api') }}',
+                method: 'GET',
+                data: function(d) {
+                    d.DATE_REPORT = $('#basic-datepicker').val();
+                    delete d.columns;
+                    delete d.order;
+                },
+            },
+            columns: [
+                {
+                    data: 'DATE_REPORT',
+                    render: function(data) {
+                        if (!data) return '';
+                        let date = new Date(data);
+                        return date.toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                    }
+                },
+                { data: 'TEAM' },
+                { data: 'ACTIVITY' },
+                {
+                    data: 'START',
+                    render: function(data) {
+                        if (!data) return '';
+                        return data.substring(0,5);
+                    }
+                },
+                {
+                    data: 'FINISH',
+                    render: function(data) {
+                        if (!data) return '';
+                        return data.substring(0,5);
+                    }
+                },
+                { data: 'PIC' },
+                { data: 'REPORTING' },
+            ],
+            "order": [[0, "desc"]],
+            "pageLength": 20,
+            "lengthMenu": [10, 20, 25, 50],
+        });
+
+        $('#refreshButton').click(function() {
+            table.ajax.reload();
+        });
+    });
+
+</script>

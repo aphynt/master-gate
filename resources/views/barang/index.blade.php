@@ -59,13 +59,14 @@
                                     @endif
                                 </td>
                                 <td>
+                                    {{-- <a href="#deleteBarang{{ $brg->UUID }}" class="btn btn-info btn-sm"
+                                        data-plugin="custommodal" data-overlaySpeed="100"
+                                        data-overlayColor="#36404a">History</a> --}}
                                     @if ($brg->ADD_BY == Auth::user()->nrp)
                                     <a href="#deleteBarang{{ $brg->UUID }}" class="btn btn-danger btn-sm"
                                         data-plugin="custommodal" data-overlaySpeed="100"
                                         data-overlayColor="#36404a">Hapus</a>
                                     @include('barang.modal.delete')
-                                    @else
-                                    -
                                     @endif
 
                                 </td>

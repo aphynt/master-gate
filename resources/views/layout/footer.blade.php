@@ -6,8 +6,7 @@
                     // document.write(new Date().getFullYear())
                     2025
 
-                </script> © {{ config('app.name') }} - by <span
-                    class="fw-semibold text-decoration-underline text-primary">IT-FMS</span>
+                </script>© 2025 Master Gate | Developed by <span class="fw-semibold text-decoration-underline text-primary">IT</span>
             </div>
         </div>
     </div>

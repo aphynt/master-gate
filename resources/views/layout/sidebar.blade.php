@@ -109,11 +109,11 @@
                 </a>
                 <div class="collapse" id="summaryReport">
                     <ul class="sub-menu">
-                        {{-- <li class="side-nav-item">
+                        <li class="side-nav-item">
                             <a href="{{ route('allActivity.index') }}" class="side-nav-link">
                                 <span class="menu-text">All Summary</span>
                             </a>
-                        </li> --}}
+                        </li>
                         <li class="side-nav-item">
                             <a href="{{ route('dailyActivity.index') }}" class="side-nav-link">
                                 <span class="menu-text">Daily Summary</span>
