@@ -64,75 +64,62 @@
 
                             <tbody id="tower-tbody">
                                 @foreach ($finalRitation as $final)
-                                     @php
-                                        $jam = $final['RANGEHOUR'];
-
-                                        $startHour = (int)explode(':', explode('-', $jam)[0])[0];
-
-                                        $total = $final['TOTAL'];
-                                        $realtime = $final['REALTIME'];
-                                        $notRealtime = $total - $realtime;
-                                        $ach = ($total > 0) ? ($realtime / $total * 100) : 0;
-
-                                        $sumTotal += $total;
-                                        $sumRealtime += $realtime;
-                                        $sumNotRealtime += $notRealtime;
-
-                                        // ✅ Siang: 07:00 – 18:59 (jam awal 07 – 18)
-                                        if ($startHour >= 7 && $startHour <= 18) {
-                                            $sumTotalSiang += $total;
-                                            $sumRealtimeSiang += $realtime;
-                                            $sumNotRealtimeSiang += $notRealtime;
-                                        } else {
-                                            $sumTotalMalam += $total;
-                                            $sumRealtimeMalam += $realtime;
-                                            $sumNotRealtimeMalam += $notRealtime;
-                                        }
-                                    @endphp
-                                    <tr @if ($notRealtime >= 10) style="background-color:#ffc107;" @endif>
-                                        <td><input type="checkbox" name="selected_items[]" value="{{ $final['CODE'] }}" style="cursor: pointer;"></td>
-                                        <td>{{ $jam }}</td>
-                                        <td>{{ $total }}</td>
-                                        <td>{{ $realtime }}</td>
-                                        <td>{{ $notRealtime }}</td>
-                                        <td>{{ $final['STATUS_PRODUKSI'] }}</td>
-                                        <td style="{{ $ach > 0 && $ach < 95.0 ? 'color: red;' : '' }}">{{ number_format($ach, 1) }}%</td>
-                                        <td>{{ $final['INFORMATION'] }}</td>
+                                    <tr @if ($final['row_highlight']) style="background-color:#ffc107;" @endif>
+                                        <td>
+                                            <input type="checkbox" name="selected_items[]" value="{{ $final['CODE'] }}" style="cursor: pointer;">
+                                        </td>
+                                        <td>{{ $final['RANGEHOUR'] }}</td>
+                                        <td>{{ $final['TOTAL'] }}</td>
+                                        <td>{{ $final['REALTIME'] }}</td>
+                                        <td>{{ $final['NOT_REALTIME'] }}</td>
+                                        <td>{{ $final['STATUS_PRODUKSI'] ?? '-' }}</td>
+                                        <td style="{{ $final['ach_warn'] ? 'color: red;' : '' }}">
+                                            {{ number_format($final['ACH'], 1) }}%
+                                        </td>
+                                        <td>{{ $final['INFORMATION'] ?? '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
 
                             <tfoot>
-                                <tr style="background-color: #d0ebff;">
-                                    <th colspan="2" style="text-align: right">Siang</th>
-                                    <th>{{ $sumTotalSiang }}</th>
-                                    <th>{{ $sumRealtimeSiang }}</th>
-                                    <th>{{ $sumNotRealtimeSiang }}</th>
+                                @php
+                                    $achSiang = $totals['sumTotalSiang']  > 0 ? ($totals['sumRealtimeSiang']  / $totals['sumTotalSiang']  * 100) : 0;
+                                    $achMalam = $totals['sumTotalMalam']  > 0 ? ($totals['sumRealtimeMalam']  / $totals['sumTotalMalam']  * 100) : 0;
+                                    $achGrand = $totals['sumTotal']       > 0 ? ($totals['sumRealtime']       / $totals['sumTotal']       * 100) : 0;
+                                @endphp
+
+                                <tr style="background-color:#d0ebff;">
+                                    <th colspan="2" class="text-right">Siang</th>
+                                    <th>{{ $totals['sumTotalSiang'] }}</th>
+                                    <th>{{ $totals['sumRealtimeSiang'] }}</th>
+                                    <th>{{ $totals['sumNotRealtimeSiang'] }}</th>
                                     <th></th>
-                                    <th style="text-align: left">
-                                        {{ $sumTotalSiang > 0 ? number_format($sumRealtimeSiang / $sumTotalSiang * 100, 1) . '%' : '0%' }}
+                                    <th style="{{ ($achSiang > 0 && $achSiang < 95) ? 'color:red;' : '' }}">
+                                        {{ number_format($achSiang, 1) }}%
                                     </th>
                                     <th></th>
                                 </tr>
-                                <tr style="background-color: #dcdcdc;">
-                                    <th colspan="2" style="text-align: right">Malam</th>
-                                    <th>{{ $sumTotalMalam }}</th>
-                                    <th>{{ $sumRealtimeMalam }}</th>
-                                    <th>{{ $sumNotRealtimeMalam }}</th>
+
+                                <tr style="background-color:#dcdcdc;">
+                                    <th colspan="2" class="text-right">Malam</th>
+                                    <th>{{ $totals['sumTotalMalam'] }}</th>
+                                    <th>{{ $totals['sumRealtimeMalam'] }}</th>
+                                    <th>{{ $totals['sumNotRealtimeMalam'] }}</th>
                                     <th></th>
-                                    <th style="text-align: left">
-                                        {{ $sumTotalMalam > 0 ? number_format($sumRealtimeMalam / $sumTotalMalam * 100, 1) . '%' : '0%' }}
+                                    <th style="{{ ($achMalam > 0 && $achMalam < 95) ? 'color:red;' : '' }}">
+                                        {{ number_format($achMalam, 1) }}%
                                     </th>
                                     <th></th>
                                 </tr>
-                                <tr style="background-color: #d4edda;">
-                                    <th colspan="2" style="text-align: right">Grand Total</th>
-                                    <th>{{ $sumTotal }}</th>
-                                    <th>{{ $sumRealtime }}</th>
-                                    <th>{{ $sumNotRealtime }}</th>
+
+                                <tr style="background-color:#d4edda;">
+                                    <th colspan="2" class="text-right">Grand Total</th>
+                                    <th>{{ $totals['sumTotal'] }}</th>
+                                    <th>{{ $totals['sumRealtime'] }}</th>
+                                    <th>{{ $totals['sumNotRealtime'] }}</th>
                                     <th></th>
-                                    <th style="text-align: left">
-                                        {{ $sumTotal > 0 ? number_format($sumRealtime / $sumTotal * 100, 1) . '%' : '0%' }}
+                                    <th style="{{ ($achGrand > 0 && $achGrand < 95) ? 'color:red;' : '' }}">
+                                        {{ number_format($achGrand, 1) }}%
                                     </th>
                                     <th></th>
                                 </tr>

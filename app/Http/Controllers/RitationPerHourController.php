@@ -11,33 +11,27 @@ use Illuminate\Support\Facades\DB;
 class RitationPerHourController extends Controller
 {
     //
+
     public function index(Request $request)
     {
-        if(!empty($request->DATE_REPORT)){
-            $date = $request->DATE_REPORT;
-        }else{
-            $date = Carbon::today()->format('Y-m-d');
-        }
+        $date = $request->DATE_REPORT ?: Carbon::today()->format('Y-m-d');
 
-        $ritationPerHour = RitationPerHour::where('STATUSENABLED', true)->where('DATE_REPORT', $date)->get();
+        // Data utama
+        $ritationPerHour = RitationPerHour::where('STATUSENABLED', true)
+            ->where('DATE_REPORT', $date)
+            ->get();
 
         $ritationPerHourFocus = DB::connection('focus')->select(
             'SET NOCOUNT ON; EXEC FOCUS_REPORTING.dbo.APP_RATE_PER_HOUR_RESUMEDATA @DATE = ?',
             [$date]
         );
+
         $statusPerHour = DB::connection('focus_reporting')
             ->table('PERIODIC.MODUS_STATUS_PER_HOUR as A')
             ->leftJoin('focus.dbo.FLT_VSASTATUS as B', 'A.STATUS_MODUS', '=', 'B.VSA_STATUSID')
             ->select(
-                'A.ID',
-                'A.DATE',
-                'A.HOUR',
-                'A.VHC_TYPE',
-                'A.VHC_ID',
-                'A.STATUS_MODUS',
-                'B.VSA_STATUSDESC',
-                'A.DURATION',
-                'A.CREATED_AT'
+                'A.ID','A.DATE','A.HOUR','A.VHC_TYPE','A.VHC_ID',
+                'A.STATUS_MODUS','B.VSA_STATUSDESC','A.DURATION','A.CREATED_AT'
             )
             ->where('A.DATE', $date)
             ->orderByDesc('A.DATE')
@@ -45,41 +39,112 @@ class RitationPerHourController extends Controller
 
         $ritationPerHourFocus = collect($ritationPerHourFocus);
 
+        // Ambil override (ganti koneksi/nama tabel sesuai DB bos)
+        $overrides = DB::table('NOT_REALTIME_OVERRIDE')
+            ->where('DATE_REPORT', $date)
+            ->get();
+
+        $overrideByCode = $overrides->whereNotNull('CODE')
+            ->keyBy(fn($o) => strtoupper(trim($o->CODE)));
+        $overrideByHour = $overrides->whereNotNull('HOUR')
+            ->keyBy('HOUR');
+
+        // Agregat
+        $sumTotal = $sumRealtime = $sumNotRealtime = 0;
+        $sumTotalSiang = $sumRealtimeSiang = $sumNotRealtimeSiang = 0;
+        $sumTotalMalam = $sumRealtimeMalam = $sumNotRealtimeMalam = 0;
+
         $finalRitation = collect();
 
         foreach ($ritationPerHourFocus as $focus) {
-            $code = $focus->CODE;
-            $rangeHour = $focus->RANGEJAM;
+            $code      = $focus->CODE;
+            $rangeHour = $focus->RANGEJAM; // "07:00-07:59"
+            $matched   = $ritationPerHour->firstWhere('CODE', $code);
 
-            $matched = $ritationPerHour->firstWhere('CODE', $code);
+            [$startHourStr] = explode('-', $rangeHour);
+            $hourInt = (int) explode(':', $startHourStr)[0];
 
-            [$startHour, $endHour] = explode('-', $rangeHour);
-            $hourInt = (int) explode(':', $startHour)[0];
-
+            // Dominan status per jam
             $statusGroup = $statusPerHour->where('HOUR', $hourInt);
-
             $dominant = $statusGroup
                 ->groupBy('VSA_STATUSDESC')
-                ->map(function ($items) {
-                    return $items->sum('DURATION'); // total durasi
-                })
+                ->map(fn($items) => $items->sum('DURATION'))
                 ->sortDesc()
                 ->keys()
                 ->first();
 
+            // Nilai dasar
+            $total        = (int) $focus->N_RATEFMS;
+            $realtimeBase = (int) $focus->N_RIT_REALTIME;
+
+            // Default notRealtime dari data base
+            $notRealtime = max(0, $total - $realtimeBase);
+
+            // Cek override (prioritas CODE > HOUR)
+            $codeKey = strtoupper(trim((string) $code));
+            if ($overrideByCode->has($codeKey)) {
+                $notRealtime = (int) $overrideByCode[$codeKey]->OVERRIDE_VALUE;
+            } elseif ($overrideByHour->has($hourInt)) {
+                $notRealtime = (int) $overrideByHour[$hourInt]->OVERRIDE_VALUE;
+            }
+
+            // Clamp agar valid
+            $notRealtime = max(0, min($notRealtime, $total));
+            // Recompute realtime mengikuti override
+            $realtime = $total - $notRealtime;
+
+            // ACH ikut realtime hasil penyesuaian
+            $ach = $total > 0 ? ($realtime / $total * 100) : 0.0;
+
+            // Style flags
+            $rowHighlight = $notRealtime >= 10;
+            $achWarn      = ($ach > 0 && $ach < 95.0);
+
+            // Agregat pakai nilai yang SUDAH disesuaikan
+            $sumTotal      += $total;
+            $sumRealtime   += $realtime;
+            $sumNotRealtime+= $notRealtime;
+
+            if ($hourInt >= 7 && $hourInt <= 18) {
+                $sumTotalSiang       += $total;
+                $sumRealtimeSiang    += $realtime;
+                $sumNotRealtimeSiang += $notRealtime;
+            } else {
+                $sumTotalMalam       += $total;
+                $sumRealtimeMalam    += $realtime;
+                $sumNotRealtimeMalam += $notRealtime;
+            }
+
             $finalRitation->push([
-                'CODE'           => $focus->CODE,
-                'RANGEHOUR'      => $focus->RANGEJAM,
-                'DATE_REPORT'    => $focus->DATE,
-                'TOTAL'          => $focus->N_RATEFMS,
-                'REALTIME'       => $focus->N_RIT_REALTIME,
-                'INFORMATION'    => $matched->INFORMATION ?? null,
-                'STATUS_PRODUKSI'=> $dominant,
+                'CODE'             => $code,
+                'RANGEHOUR'        => $rangeHour,
+                'DATE_REPORT'      => $focus->DATE,
+                'TOTAL'            => $total,
+                'REALTIME'         => $realtime,       // <— realtime sudah mengikuti override
+                'NOT_REALTIME'     => $notRealtime,    // <— nilai akhir (override kalau ada)
+                'ACH'              => $ach,
+                'INFORMATION'      => $matched->INFORMATION ?? null,
+                'STATUS_PRODUKSI'  => $dominant,
+                'row_highlight'    => $rowHighlight,
+                'ach_warn'         => $achWarn,
             ]);
         }
 
-        return view('ritationPerHour.index', compact('finalRitation'));
+        $totals = [
+            'sumTotal'               => $sumTotal,
+            'sumRealtime'            => $sumRealtime,
+            'sumNotRealtime'         => $sumNotRealtime,
+            'sumTotalSiang'          => $sumTotalSiang,
+            'sumRealtimeSiang'       => $sumRealtimeSiang,
+            'sumNotRealtimeSiang'    => $sumNotRealtimeSiang,
+            'sumTotalMalam'          => $sumTotalMalam,
+            'sumRealtimeMalam'       => $sumRealtimeMalam,
+            'sumNotRealtimeMalam'    => $sumNotRealtimeMalam,
+        ];
+
+        return view('ritationPerHour.index', compact('finalRitation', 'totals', 'date'));
     }
+
 
     public function edit(Request $request)
     {

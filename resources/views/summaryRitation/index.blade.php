@@ -73,138 +73,148 @@
                                 <tr>
                                     <th class="sticky-col">Jam</th>
                                     @foreach($groupedRitation as $date => $records)
-                                    <th colspan="4">{{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</th>
+                                        <th colspan="4">{{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</th>
                                     @endforeach
                                     <th colspan="3" class="bg-info">Grand Total</th>
                                 </tr>
                                 <tr>
                                     <th class="sticky-col"></th>
                                     @foreach($groupedRitation as $date => $records)
-                                    <th>Total</th>
-                                    <th>Realtime</th>
-                                    <th>Ach</th>
-                                    <th>Information</th>
+                                        <th>Total</th>
+                                        <th>Realtime</th>
+                                        <th>Ach</th>
+                                        <th>Information</th>
                                     @endforeach
                                     <th>Total</th>
                                     <th>Realtime</th>
                                     <th>Ach</th>
                                 </tr>
                             </thead>
+
                             <tbody>
+                            @php
+                                // Kumpulkan semua range jam unik dan urutkan (07–23 lalu 00–06)
+                                $allHours = collect($groupedRitation)->flatten(1)->pluck('RANGEHOUR')->unique()
+                                    ->sort(function($a, $b){
+                                        $toH = fn($t) => (int) explode(':', $t)[0];
+                                        $ha = $toH($a); $hb = $toH($b);
+                                        $ha = ($ha < 7) ? $ha + 24 : $ha;
+                                        $hb = ($hb < 7) ? $hb + 24 : $hb;
+                                        return $ha <=> $hb;
+                                    })->values();
+
+                                // Penampung agregat per tanggal
+                                $totals = [];
+                                $realtimes = [];
+                                $siangTotals = [];
+                                $siangRealtimes = [];
+                                $malamTotals = [];
+                                $malamRealtimes = [];
+                            @endphp
+
+                            @foreach($allHours as $hour)
                                 @php
-                                $allHours = collect($groupedRitation)
-                                ->flatten(1)
-                                ->pluck('RANGEHOUR')
-                                ->unique()
-                                ->sort(function($a, $b) {
-                                $toHour = fn($time) => (int) explode(':', $time)[0];
-                                $ha = $toHour($a); $hb = $toHour($b);
-                                $ha = $ha < 7 ? $ha + 24 : $ha; $hb=$hb < 7 ? $hb + 24 : $hb; return $ha <=> $hb;
-                                    })
-                                    ->values();
+                                    $rowTotalAllDates = 0;
+                                    $rowRealtimeAllDates = 0;
+                                    $isLowAchRowTotal = false;   // reset setiap baris jam
+                                    $rowAchAllDates = '-';
+                                @endphp
+                                <tr>
+                                    <td class="sticky-col">{{ $hour }}</td>
 
-                                    $totals = [];
-                                    $realtimes = [];
-                                    $siangTotals = [];
-                                    $siangRealtimes = [];
-                                    $malamTotals = [];
-                                    $malamRealtimes = [];
-                                    @endphp
-
-                                    @foreach($allHours as $hour)
-                                    <tr>
-                                        <td class="sticky-col">{{ $hour }}</td>
+                                    @foreach($groupedRitation as $date => $records)
                                         @php
-                                        $rowTotalAllDates = 0;
-                                        $rowRealtimeAllDates = 0;
-                                        $achValueAllDates = 0;
-                                        $rowAchAllDates = 0;
+                                            $row   = collect($records)->firstWhere('RANGEHOUR', $hour);
+                                            $total = $row['TOTAL']    ?? 0;
+                                            $rt    = $row['REALTIME'] ?? 0; // sudah override dari controller
+                                            $achValue = ($total > 0) ? round(($rt / $total) * 100, 1) : null;
+                                            $ach      = $achValue !== null ? $achValue.'%' : '-';
+                                            $info     = $row['INFORMATION'] ?? '';
+
+                                            // Akumulasi per tanggal
+                                            $totals[$date]    = ($totals[$date] ?? 0) + $total;
+                                            $realtimes[$date] = ($realtimes[$date] ?? 0) + $rt;
+
+                                            // Klasifikasi siang/malam
+                                            $hourInt = (int) explode(':', $hour)[0];
+                                            if ($hourInt >= 7 && $hourInt <= 18) {
+                                                $siangTotals[$date]    = ($siangTotals[$date] ?? 0) + $total;
+                                                $siangRealtimes[$date] = ($siangRealtimes[$date] ?? 0) + $rt;
+                                            } else {
+                                                $malamTotals[$date]    = ($malamTotals[$date] ?? 0) + $total;
+                                                $malamRealtimes[$date] = ($malamRealtimes[$date] ?? 0) + $rt;
+                                            }
+
+                                            // Akumulasi grand per baris jam (semua tanggal)
+                                            $rowTotalAllDates    += $total;
+                                            $rowRealtimeAllDates += $rt;
+                                            $achValueAllDates     = ($rowTotalAllDates > 0) ? round(($rowRealtimeAllDates / $rowTotalAllDates) * 100, 1) : null;
+                                            $rowAchAllDates       = $achValueAllDates !== null ? $achValueAllDates.'%' : '-';
+
+                                            $isLowAch = $achValue !== null && $achValue < 95;
+                                            $isLowAchRowTotal = $isLowAchRowTotal || ($achValueAllDates !== null && $achValueAllDates < 95);
                                         @endphp
-                                        @foreach($groupedRitation as $date => $records)
-                                        @php
-                                        $row = collect($records)->firstWhere('RANGEHOUR', $hour);
-                                        $total = $row['TOTAL'] ?? 0;
-                                        $rt = $row['REALTIME'] ?? 0;
-                                        $achValue = ($total > 0) ? round(($rt / $total) * 100, 1) : null;
-                                        $ach = $achValue !== null ? $achValue.'%' : '-';
-                                        $info = $row['INFORMATION'] ?? '';
 
-                                        $totals[$date] = ($totals[$date] ?? 0) + $total;
-                                        $realtimes[$date] = ($realtimes[$date] ?? 0) + $rt;
-
-                                        $hourInt = (int) explode(':', $hour)[0];
-                                        if ($hourInt >= 7 && $hourInt < 19) { $siangTotals[$date]=($siangTotals[$date]
-                                            ?? 0) + $total; $siangRealtimes[$date]=($siangRealtimes[$date] ?? 0) + $rt;
-                                            } else { $malamTotals[$date]=($malamTotals[$date] ?? 0) + $total;
-                                            $malamRealtimes[$date]=($malamRealtimes[$date] ?? 0) + $rt; }
-                                            $isLowAch=$achValue !==null && $achValue < 95; $rowTotalAllDates +=$total;
-                                            $rowRealtimeAllDates +=$rt; $achValueAllDates=($rowTotalAllDates> 0) ?
-                                            round(($rowRealtimeAllDates / $rowTotalAllDates) * 100, 1) : null;
-                                            $rowAchAllDates = $achValueAllDates !== null ? $achValueAllDates.'%' : '-';
-
-                                            $isLowAchrowTotal = $achValueAllDates !== null && $achValueAllDates < 95;
-                                                @endphp <td @if($isLowAch) style="background-color: #e77f88;" @endif>
-                                                {{ $total ?: '' }}</td>
-                                                <td @if($isLowAch) style="background-color: #e77f88;" @endif>
-                                                    {{ $rt ?: '' }}</td>
-                                                <td @if($isLowAch) style="background-color: #e77f88;" @endif>{{ $ach }}
-                                                </td>
-                                                <td style="text-align: left">{{ $info }}</td>
-                                                @endforeach
-                                                <td @if($isLowAchrowTotal) style="background-color: #e77f88;" @endif>
-                                                    {{ $rowTotalAllDates }}</td>
-                                                <td @if($isLowAchrowTotal) style="background-color: #e77f88;" @endif>
-                                                    {{ $rowRealtimeAllDates }}</td>
-                                                <td @if($isLowAchrowTotal) style="background-color: #e77f88;" @endif>
-                                                    {{ $rowAchAllDates }}</td>
-                                    </tr>
+                                        <td @if($isLowAch) style="background-color:#e77f88;" @endif>{{ $total ?: '' }}</td>
+                                        <td @if($isLowAch) style="background-color:#e77f88;" @endif>{{ $rt ?: '' }}</td>
+                                        <td @if($isLowAch) style="background-color:#e77f88;" @endif>{{ $ach }}</td>
+                                        <td style="text-align:left">{{ $info }}</td>
                                     @endforeach
+
+                                    {{-- Grand per baris jam (semua tanggal) --}}
+                                    <td @if($isLowAchRowTotal) style="background-color:#e77f88;" @endif>{{ $rowTotalAllDates }}</td>
+                                    <td @if($isLowAchRowTotal) style="background-color:#e77f88;" @endif>{{ $rowRealtimeAllDates }}</td>
+                                    <td @if($isLowAchRowTotal) style="background-color:#e77f88;" @endif>{{ $rowAchAllDates }}</td>
+                                </tr>
+                            @endforeach
                             </tbody>
+
                             <tfoot>
-                                {{-- Total --}}
+                                {{-- Total per tanggal & grand total --}}
                                 <tr class="table-success fw-bold">
                                     <td class="sticky-col">Total</td>
                                     @php
-                                    $grandTotalAllDates = 0;
-                                    $grandRealtimeAllDates = 0;
+                                        $grandTotalAllDates = 0;
+                                        $grandRealtimeAllDates = 0;
                                     @endphp
                                     @foreach($groupedRitation as $date => $records)
-                                    @php
-                                    $achValue = ($totals[$date] > 0) ? round(($realtimes[$date] / $totals[$date]) * 100,
-                                    1) : null;
-                                    $ach = $achValue !== null ? $achValue.'%' : '-';
-                                    $isLowAch = $achValue !== null && $achValue < 95; $grandTotalAllDates
-                                        +=$totals[$date]; $grandRealtimeAllDates +=$realtimes[$date]; @endphp <td
-                                        @if($isLowAch) style="background-color: #e77f88;" @endif>{{ $totals[$date] }}
-                                        </td>
-                                        <td @if($isLowAch) style="background-color: #e77f88;" @endif>
-                                            {{ $realtimes[$date] }}</td>
-                                        <td @if($isLowAch) style="background-color: #e77f88;" @endif>{{ $ach }}</td>
-                                        <td></td>
-                                        @endforeach
                                         @php
-                                        $grandAchValue = ($grandTotalAllDates > 0) ? round(($grandRealtimeAllDates /
-                                        $grandTotalAllDates) * 100, 1) : null;
+                                            $t  = $totals[$date]    ?? 0;
+                                            $rt = $realtimes[$date] ?? 0;
+                                            $achValue = ($t > 0) ? round(($rt / $t) * 100, 1) : null;
+                                            $ach = $achValue !== null ? $achValue.'%' : '-';
+                                            $isLowAch = $achValue !== null && $achValue < 95;
+
+                                            $grandTotalAllDates    += $t;
+                                            $grandRealtimeAllDates += $rt;
+                                        @endphp
+                                        <td @if($isLowAch) style="background-color:#e77f88;" @endif>{{ $t }}</td>
+                                        <td @if($isLowAch) style="background-color:#e77f88;" @endif>{{ $rt }}</td>
+                                        <td @if($isLowAch) style="background-color:#e77f88;" @endif>{{ $ach }}</td>
+                                        <td></td>
+                                    @endforeach
+                                    @php
+                                        $grandAchValue = ($grandTotalAllDates > 0) ? round(($grandRealtimeAllDates / $grandTotalAllDates) * 100, 1) : null;
                                         $grandAch = $grandAchValue !== null ? $grandAchValue.'%' : '-';
-                                        $isGrandLowAch = $grandAchValue !== null && $grandAchValue < 95; @endphp <td
-                                            class="table-success @if($isGrandLowAch) text-danger @endif">
-                                            {{ $grandTotalAllDates }}</td>
-                                            <td class="table-success @if($isGrandLowAch) text-danger @endif">
-                                                {{ $grandRealtimeAllDates }}</td>
-                                            <td class="table-success @if($isGrandLowAch) text-danger @endif">
-                                                {{ $grandAch }}</td>
+                                        $isGrandLowAch = $grandAchValue !== null && $grandAchValue < 95;
+                                    @endphp
+                                    <td class="table-success @if($isGrandLowAch) text-danger @endif">{{ $grandTotalAllDates }}</td>
+                                    <td class="table-success @if($isGrandLowAch) text-danger @endif">{{ $grandRealtimeAllDates }}</td>
+                                    <td class="table-success @if($isGrandLowAch) text-danger @endif">{{ $grandAch }}</td>
                                 </tr>
 
-                                {{-- Selisih --}}
+                                {{-- Selisih (Total - Realtime) = agregat NOT_REALTIME hasil override --}}
                                 <tr class="fw-bold">
                                     <td class="sticky-col">Selisih</td>
                                     @php $grandSelisihAllDates = 0; @endphp
                                     @foreach($groupedRitation as $date => $records)
-                                    @php
-                                    $selisih = $totals[$date] - $realtimes[$date];
-                                    $grandSelisihAllDates += $selisih;
-                                    @endphp
-                                    <td colspan="4" class="text-start">{{ $selisih }}</td>
+                                        @php
+                                            $t  = $totals[$date]    ?? 0;
+                                            $rt = $realtimes[$date] ?? 0;
+                                            $selisih = $t - $rt;
+                                            $grandSelisihAllDates += $selisih;
+                                        @endphp
+                                        <td colspan="4" class="text-start">{{ $selisih }}</td>
                                     @endforeach
                                     <td class="bg-warning" colspan="3">{{ $grandSelisihAllDates }}</td>
                                 </tr>
@@ -213,27 +223,27 @@
                                 <tr class="table-warning fw-bold">
                                     <td class="sticky-col">Siang</td>
                                     @php
-                                    $grandSiangAllDates = 0;
-                                    $grandSiangRealtimeAllDates = 0;
+                                        $grandSiangAllDates = 0;
+                                        $grandSiangRealtimeAllDates = 0;
                                     @endphp
                                     @foreach($groupedRitation as $date => $records)
-                                    @php
-                                    $achValue = ($siangTotals[$date] > 0) ? round(($siangRealtimes[$date] /
-                                    $siangTotals[$date]) * 100, 1) : null;
-                                    $ach = $achValue !== null ? $achValue.'%' : '-';
+                                        @php
+                                            $tSiang  = $siangTotals[$date]    ?? 0;
+                                            $rtSiang = $siangRealtimes[$date] ?? 0;
+                                            $achValue = ($tSiang > 0) ? round(($rtSiang / $tSiang) * 100, 1) : null;
+                                            $ach = $achValue !== null ? $achValue.'%' : '-';
 
-                                    $grandSiangAllDates += $siangTotals[$date] ?? 0;
-                                    $grandSiangRealtimeAllDates += $siangRealtimes[$date] ?? 0;
-                                    @endphp
-                                    <td>{{ $siangTotals[$date] ?? '' }}</td>
-                                    <td>{{ $siangRealtimes[$date] ?? '' }}</td>
-                                    <td>{{ $ach }}</td>
-                                    <td></td>
+                                            $grandSiangAllDates        += $tSiang;
+                                            $grandSiangRealtimeAllDates+= $rtSiang;
+                                        @endphp
+                                        <td>{{ $tSiang ?: '' }}</td>
+                                        <td>{{ $rtSiang ?: '' }}</td>
+                                        <td>{{ $ach }}</td>
+                                        <td></td>
                                     @endforeach
                                     @php
-                                    $grandSiangAchValue = ($grandSiangAllDates > 0) ? round(($grandSiangRealtimeAllDates
-                                    / $grandSiangAllDates) * 100, 1) : null;
-                                    $grandSiangAch = $grandSiangAchValue !== null ? $grandSiangAchValue.'%' : '-';
+                                        $grandSiangAchValue = ($grandSiangAllDates > 0) ? round(($grandSiangRealtimeAllDates / $grandSiangAllDates) * 100, 1) : null;
+                                        $grandSiangAch = $grandSiangAchValue !== null ? $grandSiangAchValue.'%' : '-';
                                     @endphp
                                     <td class="table-warning">{{ $grandSiangAllDates }}</td>
                                     <td class="table-warning">{{ $grandSiangRealtimeAllDates }}</td>
@@ -244,33 +254,34 @@
                                 <tr class="table-dark fw-bold">
                                     <td class="sticky-col">Malam</td>
                                     @php
-                                    $grandMalamAllDates = 0;
-                                    $grandMalamRealtimeAllDates = 0;
+                                        $grandMalamAllDates = 0;
+                                        $grandMalamRealtimeAllDates = 0;
                                     @endphp
                                     @foreach($groupedRitation as $date => $records)
-                                    @php
-                                    $achValue = ($malamTotals[$date] > 0) ? round(($malamRealtimes[$date] /
-                                    $malamTotals[$date]) * 100, 1) : null;
-                                    $ach = $achValue !== null ? $achValue.'%' : '-';
+                                        @php
+                                            $tMalam  = $malamTotals[$date]    ?? 0;
+                                            $rtMalam = $malamRealtimes[$date] ?? 0;
+                                            $achValue = ($tMalam > 0) ? round(($rtMalam / $tMalam) * 100, 1) : null;
+                                            $ach = $achValue !== null ? $achValue.'%' : '-';
 
-                                    $grandMalamAllDates += $malamTotals[$date] ?? 0;
-                                    $grandMalamRealtimeAllDates += $malamRealtimes[$date] ?? 0;
-                                    @endphp
-                                    <td>{{ $malamTotals[$date] ?? '' }}</td>
-                                    <td>{{ $malamRealtimes[$date] ?? '' }}</td>
-                                    <td>{{ $ach }}</td>
-                                    <td></td>
+                                            $grandMalamAllDates         += $tMalam;
+                                            $grandMalamRealtimeAllDates += $rtMalam;
+                                        @endphp
+                                        <td>{{ $tMalam ?: '' }}</td>
+                                        <td>{{ $rtMalam ?: '' }}</td>
+                                        <td>{{ $ach }}</td>
+                                        <td></td>
                                     @endforeach
                                     @php
-                                    $grandMalamAchValue = ($grandMalamAllDates > 0) ? round(($grandMalamRealtimeAllDates
-                                    / $grandMalamAllDates) * 100, 1) : null;
-                                    $grandMalamAch = $grandMalamAchValue !== null ? $grandMalamAchValue.'%' : '-';
+                                        $grandMalamAchValue = ($grandMalamAllDates > 0) ? round(($grandMalamRealtimeAllDates / $grandMalamAllDates) * 100, 1) : null;
+                                        $grandMalamAch = $grandMalamAchValue !== null ? $grandMalamAchValue.'%' : '-';
                                     @endphp
                                     <td class="table-dark">{{ $grandMalamAllDates }}</td>
                                     <td class="table-dark">{{ $grandMalamRealtimeAllDates }}</td>
                                     <td class="table-dark">{{ $grandMalamAch }}</td>
                                 </tr>
                             </tfoot>
+
                         </table>
 
                     </div>
