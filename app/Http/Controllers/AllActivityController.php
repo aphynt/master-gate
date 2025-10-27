@@ -62,7 +62,6 @@ class AllActivityController extends Controller
                 return $act;
             });
 
-        // --- Ambil data Tower ---
         $tower = DB::table('activity_tower as at')
             ->leftJoin('LIST_TOWER as lt', 'at.UUID_TOWER', 'lt.UUID')
             ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
@@ -71,7 +70,17 @@ class AllActivityController extends Controller
                 'at.STATUSENABLED',
                 'at.START',
                 'at.FINISH',
-                DB::raw("CONCAT('(', lt.NAMA, ') ', at.ACTION_PROBLEM, ' (', at.ACTUAL_PROBLEM, ')') as ACTIVITY"),
+                DB::raw("
+                CONCAT(
+                    '(', lt.NAMA, ') ',
+                    at.ACTION_PROBLEM,
+                    CASE
+                    WHEN NULLIF(LTRIM(RTRIM(at.ACTUAL_PROBLEM)), '') IS NULL
+                        THEN ''
+                    ELSE CONCAT(' (', at.ACTUAL_PROBLEM, ')')
+                    END
+                ) AS ACTIVITY
+                "),
                 'at.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'at.DATE_ACTION as DATE_REPORT',
@@ -85,7 +94,6 @@ class AllActivityController extends Controller
                 return $act;
             });
 
-        // --- Ambil data Unit ---
         $unit = DB::table('ACTIVITY_UNIT as un')
             ->leftJoin('LIST_UNIT as lu', 'un.UUID_UNIT', 'lu.UUID')
             ->leftJoin('users as us', 'un.REPORTING', 'us.nrp')
@@ -94,7 +102,17 @@ class AllActivityController extends Controller
                 'un.STATUSENABLED',
                 'un.START',
                 'un.FINISH',
-                DB::raw("CONCAT('(', lu.VHC_ID, ') ', un.ACTION_PROBLEM, ' (', un.ACTUAL_PROBLEM, ')') as ACTIVITY"),
+                DB::raw("
+                CONCAT(
+                    '(', lu.VHC_ID, ') ',
+                    un.ACTION_PROBLEM,
+                    CASE
+                    WHEN NULLIF(LTRIM(RTRIM(un.ACTUAL_PROBLEM)), '') IS NULL
+                        THEN ''
+                    ELSE CONCAT(' (', un.ACTUAL_PROBLEM, ')')
+                    END
+                ) AS ACTIVITY
+                "),
                 'un.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'un.DATE_ACTION as DATE_REPORT',
@@ -108,7 +126,6 @@ class AllActivityController extends Controller
                 return $act;
             });
 
-        // --- Ambil data Genset ---
         $genset = DB::table('ACTIVITY_GENSET as gen')
             ->leftJoin('users as us', 'gen.REPORTING', 'us.nrp')
             ->leftJoin('LIST_TOWER as twr', 'gen.UUID_TOWER', 'twr.UUID')
@@ -133,21 +150,53 @@ class AllActivityController extends Controller
 
         $teamOrder = ['All Team', 'Tower', 'Unit'];
 
+        function normalizeTime($t) {
+            if (!$t) return '00:00:00';
+            [$h, $m, $s] = array_pad(preg_split('/\D+/', $t), 3, 0);
+            $h = str_pad((int)$h, 2, '0', STR_PAD_LEFT);
+            $m = str_pad((int)$m, 2, '0', STR_PAD_LEFT);
+            $s = str_pad((int)$s, 2, '0', STR_PAD_LEFT);
+            return "$h:$m:$s";
+        }
+
         $dailyActivity = collect()
             ->merge($additional)
             ->merge($tower)
             ->merge($unit)
-            ->merge($genset)
-            ->sortByDesc('DATE_REPORT')
-            ->values();
+            ->merge($genset);
+
         if (!empty($search)) {
             $dailyActivity = $dailyActivity->filter(function ($item) use ($search) {
                 return stripos($item->ACTIVITY, $search) !== false ||
+                    stripos($item->DATE_REPORT, $search) !== false ||
                     stripos($item->PIC, $search) !== false ||
                     stripos($item->REPORTING, $search) !== false ||
                     stripos($item->TEAM, $search) !== false;
-            })->values();
+            });
         }
+
+        // Sort: DATE_REPORT desc, lalu START asc (stabil & tipe-aman)
+        $dailyActivity = $dailyActivity->sort(function ($a, $b) {
+            // Pastikan DATE_REPORT bisa diparse; kalau sudah Y-m-d ini aman.
+            $da = Carbon::parse($a->DATE_REPORT)->startOfDay()->timestamp;
+            $db = Carbon::parse($b->DATE_REPORT)->startOfDay()->timestamp;
+
+            if ($da !== $db) {
+                return $db <=> $da; // DESC utk tanggal
+            }
+
+            // Sama tanggal → bandingkan jam mulai (ASC)
+            $sa = normalizeTime($a->START ?? '00:00:00');
+            $sb = normalizeTime($b->START ?? '00:00:00');
+
+            // hitung detik sejak tengah malam
+            [$ha,$ma,$sa2] = array_map('intval', explode(':', $sa));
+            [$hb,$mb,$sb2] = array_map('intval', explode(':', $sb));
+            $secA = $ha*3600 + $ma*60 + $sa2;
+            $secB = $hb*3600 + $mb*60 + $sb2;
+
+            return $secA <=> $secB; // ASC
+        })->values();
 
         $filteredRecords = $dailyActivity->count();
 

@@ -68,7 +68,17 @@ class DailyActivityController extends Controller
                 'at.STATUSENABLED',
                 'at.START',
                 'at.FINISH',
-                DB::raw("CONCAT('(', lt.NAMA, ') ', at.ACTION_PROBLEM, ' (', at.ACTUAL_PROBLEM, ')') as ACTIVITY"),
+                DB::raw("
+                CONCAT(
+                    '(', lt.NAMA, ') ',
+                    at.ACTION_PROBLEM,
+                    CASE
+                    WHEN NULLIF(LTRIM(RTRIM(at.ACTUAL_PROBLEM)), '') IS NULL
+                        THEN ''
+                    ELSE CONCAT(' (', at.ACTUAL_PROBLEM, ')')
+                    END
+                ) AS ACTIVITY
+                "),
                 'at.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'at.DATE_ACTION as DATE_REPORT',
@@ -91,7 +101,17 @@ class DailyActivityController extends Controller
                 'un.STATUSENABLED',
                 'un.START',
                 'un.FINISH',
-                DB::raw("CONCAT('(', lu.VHC_ID, ') ', un.ACTION_PROBLEM, ' (', un.ACTUAL_PROBLEM, ')') as ACTIVITY"),
+                DB::raw("
+                CONCAT(
+                    '(', lu.VHC_ID, ') ',
+                    un.ACTION_PROBLEM,
+                    CASE
+                    WHEN NULLIF(LTRIM(RTRIM(un.ACTUAL_PROBLEM)), '') IS NULL
+                        THEN ''
+                    ELSE CONCAT(' (', un.ACTUAL_PROBLEM, ')')
+                    END
+                ) AS ACTIVITY
+                "),
                 'un.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'un.DATE_ACTION as DATE_REPORT',
