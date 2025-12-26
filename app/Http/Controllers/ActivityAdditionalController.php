@@ -24,7 +24,7 @@ class ActivityAdditionalController extends Controller
 
         $users = DB::table('users')->pluck('name', 'nrp');
 
-        $pengguna = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         $team = ListTeam::where('STATUSENABLED', true)->get();
 
@@ -61,9 +61,40 @@ class ActivityAdditionalController extends Controller
             }
 
             $act->ACTION_BY = implode(', ', $names);
+            $act->ACTION_BY_NRP = implode(', ', $nrps);
         }
 
-        return view('activityAdditional.index', compact('activity', 'team', 'pengguna'));
+        return view('activityAdditional.index', compact('activity', 'team', 'user'));
+    }
+
+    public function updatePersonil(Request $request, $uuidTower)
+    {
+        $actionByArr = $request->input("action_by.$uuidTower", []);
+
+        $actionByArr = array_filter(
+            array_map('trim', $actionByArr)
+        );
+
+        if (count($actionByArr) === 0) {
+            return back()->with('error', 'Minimal 1 personil harus diisi');
+        }
+
+        // Gabungkan jadi string
+        $actionByString = implode(',', $actionByArr);
+
+        // dd($actionByString);
+
+
+        try {
+            ActivityAdditional::where('UUID', $uuidTower)
+            ->update([
+                'ACTION_BY' => $actionByString
+            ]);
+
+        return back()->with('success', 'Personil berhasil diperbarui');
+        } catch (\Throwable $th) {
+            return back()->with('info', 'Personil gagal diperbarui'. $th->getMessage());
+        }
     }
 
     public function insert()

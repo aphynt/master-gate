@@ -2,10 +2,18 @@
 @include('layout.sidebar')
 @include('layout.header')
 <style>
+    #datatable {
+        table-layout: fixed;
+        width: 100%;
+    }
 
-.select2-container {
-  z-index: 9999 !important;
-}
+    .wrap-text {
+        max-width: 250px;
+        white-space: normal;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+
 </style>
 <div class="page-container">
 
@@ -43,7 +51,7 @@
             <div class="card">
                 <div class="card-body pt-2">
                     <form id="form-unit" >
-                        <table id="datatable" class="table table-bordered dt-responsive nowrap"
+                        <table id="datatable" class="table table-bordered dt-responsive"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
@@ -83,17 +91,21 @@
                                     <td>{{ $unt->REPORTING }}</td>
                                     <td>
                                         @if (Auth::user()->nrp == $unt->NRP_REPORTING)
+                                        <div class="d-flex gap-1">
                                             <a href="#deletelistActivity{{ $unt->UUID }}"
-                                            class="btn btn-danger waves-effect waves-light btn-sm" data-animation="contentscale"
-                                            data-plugin="custommodal" data-overlaySpeed="100"
-                                            data-overlayColor="#36404a">Hapus</a>
-                                            @include('activityUnit.modal.delete')
+                                                class="btn btn-danger btn-sm waves-effect waves-light"
+                                                data-animation="contentscale" data-plugin="custommodal">
+                                                Hapus
+                                            </a>
 
-                                            {{-- <a href="#editWorkerlistActivity{{ $unt->ID }}"
-                                            class="btn btn-warning waves-effect waves-light btn-sm" data-animation="blur"
-                                            data-plugin="custommodal" data-overlaySpeed="100"
-                                            data-overlayColor="#36404a">Edit Worker</a>
-                                            @include('activityUnit.modal.editWorker') --}}
+                                            <a href="#editPersonil{{ $unt->UUID }}"
+                                                class="btn btn-warning btn-sm waves-effect waves-light"
+                                                data-animation="blur" data-plugin="custommodal">
+                                                Edit Personil
+                                            </a>
+                                        </div>
+                                        @include('activityUnit.modal.delete')
+
                                         @endif
                                     </td>
                                 </tr>
@@ -101,6 +113,9 @@
                             </tbody>
                         </table>
                     </form>
+                    @foreach ($unit as $unt)
+                        @include('activityUnit.modal.editPersonil')
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -108,6 +123,53 @@
 </div>
 
 @include('layout.footer')
+<script>
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('add-action')) {
+            const uuid = e.target.dataset.uuid;
+            const container = document.getElementById('actionByContainer' + uuid);
+            const index = container.children.length + 1;
+
+            const row = document.createElement('div');
+            row.className = 'mb-3 d-flex align-items-center action-row';
+            row.innerHTML = `
+                <div class="flex-grow-1 me-2">
+                    <label class="form-label">Personil ${index}</label>
+                    <select class="form-select" name="action_by[${uuid}][]">
+                        <option selected>-- Pilih Personil --</option>
+                        @foreach ($user as $uss)
+                            <option value="{{ $uss->NRP }}">{{ $uss->NAME }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="button" class="btn btn-danger btn-sm remove-action mt-4">
+                    Hapus
+                </button>
+            `;
+
+            container.appendChild(row);
+        }
+
+        // ============================
+        // HAPUS PERSONIL
+        // ============================
+        if (e.target.classList.contains('remove-action')) {
+            const row = e.target.closest('.action-row');
+            const container = row.parentElement;
+
+            row.remove();
+
+            // Re-number label
+            Array.from(container.children).forEach((el, idx) => {
+                const label = el.querySelector('label');
+                if (label) {
+                    label.textContent = 'Personil ' + (idx + 1);
+                }
+            });
+        }
+    });
+
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const dateInput = document.getElementById('basic-datepicker');

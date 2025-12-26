@@ -87,10 +87,39 @@ class ActivityUnitController extends Controller
             }
 
             $act->ACTION_BY = implode(', ', $names);
+            $act->ACTION_BY_NRP = implode(', ', $nrps);
         }
         // dd($unit);
 
         return view('activityUnit.index', compact('unit', 'user'));
+    }
+
+    public function updatePersonil(Request $request, $uuidTower)
+    {
+        // Ambil array personil berdasarkan UUID tower
+        $actionByArr = $request->input("action_by.$uuidTower", []);
+
+        // Pastikan array & bersih dari spasi
+        $actionByArr = array_filter(
+            array_map('trim', $actionByArr)
+        );
+
+        if (count($actionByArr) === 0) {
+            return back()->with('error', 'Minimal 1 personil harus diisi');
+        }
+
+        $actionByString = implode(',', $actionByArr);
+
+        try {
+            ActivityUnit::where('UUID', $uuidTower)
+            ->update([
+                'ACTION_BY' => $actionByString
+            ]);
+
+        return back()->with('success', 'Personil berhasil diperbarui');
+        } catch (\Throwable $th) {
+            return back()->with('info', 'Personil gagal diperbarui'. $th->getMessage());
+        }
     }
 
     public function updateWorker(Request $request, $uuid)

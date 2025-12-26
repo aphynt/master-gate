@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <i class="icon-layers float-end m-0 h2 text-muted"></i>
                     <h6 class="text-muted text-uppercase mt-0">Stok Barang <span class="text-success" style="font-size: 8pt">(Monthly)</span></h6>
-                    <h3 class="my-3" data-plugin="counterup">-</h3>
+                    <h3 class="my-3" data-plugin="counterup">{{ $dataSummary['totalBarang'] }}</h3>
                 </div>
             </div>
         </div>
@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <i class="icon-chart float-end m-0 h2 text-muted"></i>
                     <h6 class="text-muted text-uppercase mt-0">Barang Masuk <span class="text-success" style="font-size: 8pt">(Monthly)</span></h6>
-                    <h3 class="my-3"><span data-plugin="counterup">-</span></h3>
+                    <h3 class="my-3"><span data-plugin="counterup">{{ $dataSummary['totalBarangMasukBulanan'] }}</span></h3>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 <div class="card-body">
                     <i class="icon-chart float-end m-0 h2 text-muted"></i>
                     <h6 class="text-muted text-uppercase mt-0">Barang Keluar <span class="text-success" style="font-size: 8pt">(Monthly)</span></h6>
-                    <h3 class="my-3"><span data-plugin="counterup">-</span></h3>
+                    <h3 class="my-3"><span data-plugin="counterup">{{ $dataSummary['totalBarangKeluarBulanan'] }}</span></h3>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 <div class="card-body">
                     <i class="icon-chart float-end m-0 h2 text-muted"></i>
                     <h6 class="text-muted text-uppercase mt-0">Barang Keluar <span class="text-success" style="font-size: 8pt">(Daily)</span></h6>
-                    <h3 class="my-3" data-plugin="counterup">-</h3>
+                    <h3 class="my-3" data-plugin="counterup">{{ $dataSummary['totalBarangKeluarHarian'] }}</h3>
                 </div>
             </div>
         </div>
@@ -62,7 +62,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="card card-body">
-                        <h4 class="header-title mb-3">Today's Maintained Unit (Target: 7 unit/day)</h4>
+                        <h4 class="header-title mb-3">Unit yang Dimaintenance Hari Ini (Target: 7 unit/hari)</h4>
 
                         <p class="font-weight-semibold mb-3">{{ $dataSummary['todayMaintainedUnit'] }} <span class="text-success float-end"><b>{{ $dataSummary['todayMaintainedPercentUnit'] }}%</b></span>
                         </p>
@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="card card-body">
-                        <h4 class="header-title mb-3">Yesterday's Maintained Unit (Target: 7 unit/day)</h4>
+                        <h4 class="header-title mb-3">Unit yang Dimaintenance Kemarin (Target: 7 unit/hari)</h4>
 
                         <p class="font-weight-semibold mb-2">{{ $dataSummary['yesterdayMaintainedUnit'] }} <span
                                 class="text-info float-end"><b>{{ $dataSummary['yesterdayMaintainedPercentUnit'] }}%</b></span></p>
@@ -86,7 +86,7 @@
                     </div>
 
                     <div class="card card-body">
-                        <h4 class="header-title mb-3">This Month's Maintained Unit</h4>
+                        <h4 class="header-title mb-3">Jumlah Unit yang Dimaintenance Bulan Ini</h4>
 
                         <p class="font-weight-semibold mb-2">{{ $dataSummary['monthlyMaintainedUnit'] }} <span
                                 class="text-dark float-end"><b>{{ $dataSummary['monthlyMaintainedPercentUnit'] }}%</b></span></p>
@@ -97,11 +97,23 @@
                         </div>
                     </div>
 
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">Jumlah Unit yang Dimaintenance Bulan Lalu</h4>
+
+                        <p class="font-weight-semibold mb-2">{{ $dataSummary['lastMonthMaintainedUnit'] }} <span
+                                class="text-dark float-end"><b>{{ $dataSummary['lastMonthMaintainedPercentUnit'] }}%</b></span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-dark" role="progressbar"
+                                style="width: {{ $dataSummary['lastMonthMaintainedPercentUnit'] }}%" aria-valuenow="{{ $dataSummary['lastMonthMaintainedPercentUnit'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="col-md-6">
                     <div class="card card-body">
-                        <h4 class="header-title mb-3">Today's Maintained Tower (Target: 1 tower/day)</h4>
+                        <h4 class="header-title mb-3">Tower yang Dimaintenance Hari Ini (Target: 1 tower/hari)</h4>
 
                         <p class="font-weight-semibold mb-3">{{ $dataSummary['todayMaintainedTower'] }} <span class="text-success float-end"><b>{{ $dataSummary['todayMaintainedPercentTower'] }}%</b></span>
                         </p>
@@ -113,7 +125,7 @@
                     </div>
 
                     <div class="card card-body">
-                        <h4 class="header-title mb-3">Yesterday's Maintained Tower (Target: 1 tower/day)</h4>
+                        <h4 class="header-title mb-3">Tower yang Dimaintenance Kemarin (Target: 1 tower/hari)</h4>
 
                         <p class="font-weight-semibold mb-2">{{ $dataSummary['yesterdayMaintainedTower'] }} <span
                                 class="text-info float-end"><b>{{ $dataSummary['yesterdayMaintainedPercentTower'] }}%</b></span></p>
@@ -125,7 +137,7 @@
                     </div>
 
                     <div class="card card-body">
-                        <h4 class="header-title mb-3">This Month's Maintained Tower</h4>
+                        <h4 class="header-title mb-3">Tower yang Dimaintenance Bulan Ini</h4>
 
                         <p class="font-weight-semibold mb-2">{{ $dataSummary['monthlyMaintainedTower'] }} <span
                                 class="text-dark float-end"><b>{{ $dataSummary['monthlyMaintainedPercentTower'] }}%</b></span></p>
@@ -136,7 +148,21 @@
                         </div>
                     </div>
 
+                    <div class="card card-body">
+                        <h4 class="header-title mb-3">Tower yang Dimaintenance Bulan Lalu</h4>
+
+                        <p class="font-weight-semibold mb-2">{{ $dataSummary['lastMonthMaintainedTower'] }} <span
+                                class="text-dark float-end"><b>{{ $dataSummary['lastMonthMaintainedPercentTower'] }}%</b></span></p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-striped bg-dark" role="progressbar"
+                                style="width: {{ $dataSummary['lastMonthMaintainedPercentTower'] }}%" aria-valuenow="{{ $dataSummary['lastMonthMaintainedPercentTower'] }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
+
 
             </div>
         </div><!-- end col-->

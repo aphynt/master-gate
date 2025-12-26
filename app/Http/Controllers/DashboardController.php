@@ -25,6 +25,12 @@ class DashboardController extends Controller
         $bulanTahun = request()->filled('DATE_REPORT') ? substr(request('DATE_REPORT'), 0, 7) : Carbon::now()->format('Y-m');
         $carbonBulan = Carbon::parse($bulanTahun)->startOfMonth();
 
+        $lastMonthCarbon = $carbonBulan->copy()->subMonth();
+        $lastMonth = $lastMonthCarbon->format('Y-m');
+
+        $lastMonthStart = $lastMonthCarbon->copy()->startOfMonth()->toDateString();
+        $lastMonthEnd   = $lastMonthCarbon->copy()->endOfMonth()->toDateString();
+
 
         // periode MT berdasarkan tanggal hari ini
         if ($tanggalSekarang < 16) {
@@ -76,7 +82,6 @@ class DashboardController extends Controller
         "))->addBinding([$bulanUnit])
         ->where('rn', 1);
 
-        // Gabungkan dengan data unit dan lokasi
         $maintenanceUnit = DB::table('LIST_UNIT as lu')
             ->leftJoinSub($latestActivityUnit, 'latest', fn($join) =>
                 $join->on('lu.UUID', '=', 'latest.UUID_UNIT'))
@@ -102,6 +107,24 @@ class DashboardController extends Controller
                 $row->ACTION_BY = $row->ACTION_BY ? $convertPIC($row->ACTION_BY) : null;
                 return $row;
             });
+
+        $lastMonthMaintainedUnit = DB::table('ACTIVITY_UNIT as au')
+        ->join('LIST_ACTIVITY as act', 'au.UUID_ACTIVITY', '=', 'act.UUID')
+        ->where('au.STATUSENABLED', 1)
+        ->where('act.ID', 2)
+        ->whereBetween('au.DATE_ACTION', [$lastMonthStart, $lastMonthEnd])
+        ->distinct('au.UUID_UNIT')
+        ->count('au.UUID_UNIT');
+
+        $lastMonthMaintainedTower = DB::table('ACTIVITY_TOWER as au')
+        ->join('LIST_ACTIVITY as act', 'au.UUID_ACTIVITY', '=', 'act.UUID')
+        ->where('au.STATUSENABLED', 1)
+        ->where('act.ID', 2)
+        ->whereBetween('au.DATE_ACTION', [$lastMonthStart, $lastMonthEnd])
+        ->distinct('au.UUID_TOWER')
+        ->count('au.UUID_TOWER');
+
+
 
         $latestActivityTower = DB::table(DB::raw("
             (
@@ -202,6 +225,9 @@ class DashboardController extends Controller
         $yesterdayMaintainedPercentTower = $percentage($yesterdayMaintainedTower, 1);
         $monthlyMaintainedPercentTower = $percentage($monthlyMaintainedTower, $totalPlanAllTower);
 
+        $lastMonthMaintainedPercentUnit = $percentage($lastMonthMaintainedUnit, $totalPlanAllUnit);
+        $lastMonthMaintainedPercentTower = $percentage($lastMonthMaintainedTower, $totalPlanAllTower);
+
         $statusUnit = collect(DB::connection('focus')->select('SET NOCOUNT ON; EXEC FOCUS_REPORTING.DBO.RPT_DASHBOARD_RESUME_TOTAL_UNIT'));
 
         $totalBarang = Barang::where('STATUSENABLED', true)->count();
@@ -232,6 +258,17 @@ class DashboardController extends Controller
 
             'monthlyMaintainedUnit' => $monthlyMaintainedUnit,
             'monthlyMaintainedPercentUnit' => $monthlyMaintainedPercentUnit,
+
+            'lastMonthMaintainedUnit' => $lastMonthMaintainedUnit,
+            'lastMonthMaintainedPercentUnit' => $lastMonthMaintainedPercentUnit,
+
+            'lastMonthMaintainedTower' => $lastMonthMaintainedTower,
+            'lastMonthMaintainedPercentTower' => $lastMonthMaintainedPercentTower,
+
+            'totalBarang' => $totalBarang,
+            'totalBarangMasukBulanan' => $totalBarangMasukBulanan,
+            'totalBarangKeluarBulanan' => $totalBarangKeluarBulanan,
+            'totalBarangKeluarHarian' => $totalBarangKeluarHarian,
 
 
             'statusUnit' => $statusUnit,

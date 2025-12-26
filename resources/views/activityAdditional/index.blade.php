@@ -1,6 +1,20 @@
 @include('layout.head', ['title' => 'Activity Additional'])
 @include('layout.sidebar')
 @include('layout.header')
+<style>
+    #datatable {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .wrap-text {
+        max-width: 250px;
+        white-space: normal;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+
+</style>
 <div class="page-container">
 
     <div class="page-title-box">
@@ -27,7 +41,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body pt-2">
-                    <table id="datatable" class="table table-bordered dt-responsive nowrap"
+                    <table id="datatable" class="table table-bordered dt-responsive"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
@@ -55,23 +69,27 @@
                                 <td>{{ $act->REPORTING }}</td>
                                 <td>
                                     @if (Auth::user()->nrp == $act->NRP_REPORTING)
-                                        {{-- <a href="#editOnsite{{ $act->UUID }}"
-                                        class="btn btn-dark waves-effect waves-light btn-sm" data-animation="contentscale"
-                                        data-plugin="custommodal" data-overlaySpeed="100"
-                                        data-overlayColor="#36404a">Update On-site</a>
-                                        @include('activityAdditional.modal.onsite') --}}
 
-                                        <a href="#editlistActivity{{ $act->UUID }}"
-                                        class="btn btn-purple waves-effect waves-light btn-sm" data-animation="contentscale"
-                                        data-plugin="custommodal" data-overlaySpeed="100"
-                                        data-overlayColor="#36404a">Edit</a>
-                                        @include('activityAdditional.modal.edit')
+                                        <div class="d-flex gap-1">
+                                            <a href="#editlistActivity{{ $act->UUID }}"
+                                            class="btn btn-purple waves-effect waves-light btn-sm" data-animation="contentscale"
+                                            data-plugin="custommodal" data-overlaySpeed="100"
+                                            data-overlayColor="#36404a">Edit</a>
+                                            @include('activityAdditional.modal.edit')
 
-                                        <a href="#deletelistActivity{{ $act->UUID }}"
-                                        class="btn btn-danger waves-effect waves-light btn-sm" data-animation="contentscale"
-                                        data-plugin="custommodal" data-overlaySpeed="100"
-                                        data-overlayColor="#36404a">Hapus</a>
-                                        @include('activityAdditional.modal.delete')
+                                            <a href="#deletelistActivity{{ $act->UUID }}"
+                                            class="btn btn-danger waves-effect waves-light btn-sm" data-animation="contentscale"
+                                            data-plugin="custommodal" data-overlaySpeed="100"
+                                            data-overlayColor="#36404a">Hapus</a>
+                                            @include('activityAdditional.modal.delete')
+
+                                            <a href="#editPersonil{{ $act->UUID }}"
+                                                class="btn btn-warning btn-sm waves-effect waves-light"
+                                                data-animation="blur" data-plugin="custommodal">
+                                                Edit Personil
+                                            </a>
+                                            @include('activityAdditional.modal.editPersonil')
+                                        </div>
                                     @endif
                                 </td>
                             </tr>
@@ -84,6 +102,53 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('add-action')) {
+            const uuid = e.target.dataset.uuid;
+            const container = document.getElementById('actionByContainer' + uuid);
+            const index = container.children.length + 1;
+
+            const row = document.createElement('div');
+            row.className = 'mb-3 d-flex align-items-center action-row';
+            row.innerHTML = `
+                <div class="flex-grow-1 me-2">
+                    <label class="form-label">Personil ${index}</label>
+                    <select class="form-select" name="action_by[${uuid}][]">
+                        <option selected>-- Pilih Personil --</option>
+                        @foreach ($user as $uss)
+                            <option value="{{ $uss->NRP }}">{{ $uss->NAME }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="button" class="btn btn-danger btn-sm remove-action mt-4">
+                    Hapus
+                </button>
+            `;
+
+            container.appendChild(row);
+        }
+
+        // ============================
+        // HAPUS PERSONIL
+        // ============================
+        if (e.target.classList.contains('remove-action')) {
+            const row = e.target.closest('.action-row');
+            const container = row.parentElement;
+
+            row.remove();
+
+            // Re-number label
+            Array.from(container.children).forEach((el, idx) => {
+                const label = el.querySelector('label');
+                if (label) {
+                    label.textContent = 'Personil ' + (idx + 1);
+                }
+            });
+        }
+    });
+
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const dateInput = document.getElementById('basic-datepicker');

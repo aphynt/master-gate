@@ -89,9 +89,37 @@ class ActivityTowerController extends Controller
         return view('activityTower.insert', compact('tower', 'user', 'activity', 'reqBy', 'actual', 'status', 'barang'));
     }
 
-    public function updatePersonil(Request $request)
+    public function updatePersonil(Request $request, $uuidTower)
     {
-        dd($request->all());
+        // Ambil array personil berdasarkan UUID tower
+        $actionByArr = $request->input("action_by.$uuidTower", []);
+
+        // Pastikan array & bersih dari spasi
+        $actionByArr = array_filter(
+            array_map('trim', $actionByArr)
+        );
+
+        // Validasi minimal 1 personil
+        if (count($actionByArr) === 0) {
+            return back()->with('error', 'Minimal 1 personil harus diisi');
+        }
+
+        // Gabungkan jadi string
+        $actionByString = implode(',', $actionByArr);
+
+        // dd($actionByString);
+
+
+        try {
+            ActivityTower::where('UUID', $uuidTower)
+            ->update([
+                'ACTION_BY' => $actionByString
+            ]);
+
+        return back()->with('success', 'Personil berhasil diperbarui');
+        } catch (\Throwable $th) {
+            return back()->with('info', 'Personil gagal diperbarui'. $th->getMessage());
+        }
     }
 
     public function post(Request $request)

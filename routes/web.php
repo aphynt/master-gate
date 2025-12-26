@@ -163,6 +163,7 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/activityUnit/edit', [ActivityUnitController::class, 'edit'])->name('activityUnit.edit');
     Route::get('/activityUnit/delete/{uuid}', [ActivityUnitController::class, 'delete'])->name('activityUnit.delete');
     Route::post('/activityUnit/updateWorker/{uuid}', [ActivityUnitController::class, 'updateWorker'])->name('activityUnit.updateWorker');
+    Route::post('/activityUnit/updatePersonil/{uuid}', [ActivityUnitController::class, 'updatePersonil'])->name('activityUnit.updatePersonil');
 
     //Activity Genset
     Route::get('/activityGenset', [ActivityGensetController::class, 'index'])->name('activityGenset.index');
@@ -178,6 +179,7 @@ Route::group(['middleware' => ['auth']], function(){
     Route::post('/activityAdditional/post', [ActivityAdditionalController::class, 'post'])->name('activityAdditional.post');
     Route::post('/activityAdditional/update/{uuid}', [ActivityAdditionalController::class, 'update'])->name('activityAdditional.update');
     Route::get('/activityAdditional/delete/{uuid}', [ActivityAdditionalController::class, 'delete'])->name('activityAdditional.delete');
+    Route::post('/activityAdditional/updatePersonil/{uuid}', [ActivityAdditionalController::class, 'updatePersonil'])->name('activityAdditional.updatePersonil');
 
      //Activity Pergantian Barang
     Route::get('/activityPergantianBarang', [ActivityPergantianBarangController::class, 'index'])->name('activityPergantianBarang.index');

@@ -1,28 +1,28 @@
 @php
-$actionByArr = array_map('trim', explode(',', $twr->ACTION_BY));
-$actionByArrNRP = array_map('trim', explode(',', $twr->ACTION_BY_NRP));
+$actionByArr = array_map('trim', explode(',', $act->ACTION_BY));
+$actionByArrNRP = array_map('trim', explode(',', $act->ACTION_BY_NRP));
 $actionCount = count($actionByArr);
 @endphp
 
-<div class="modal-demo" id="editPersonil{{ $twr->UUID }}" style="background-color:transparent">
+<div class="modal-demo" id="editPersonil{{ $act->UUID }}" style="background-color:transparent">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="card">
 
                 <div class="card-body">
-                    <form action="{{ route('activityTower.updatePersonil', $twr->UUID ) }}" method="post" id="formPersonil-{{ $twr->UUID }}">
+                    <form action="{{ route('activityAdditional.updatePersonil', $act->UUID ) }}" method="post" id="formPersonil-{{ $act->UUID }}">
                         @csrf
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Personil</h5>
                         </div>
 
                         {{-- Container dinamis --}}
-                        <div id="actionByContainer{{ $twr->UUID }}">
+                        <div id="actionByContainer{{ $act->UUID }}">
                             @foreach ($actionByArr as $i => $name)
                             <div class="mb-3 d-flex align-items-center action-row">
                                 <div class="flex-grow-1 me-2">
                                     <label class="form-label">Personil {{ $i + 1 }}</label>
-                                    <select class="form-select" name="action_by[{{ $twr->UUID }}][]">
+                                    <select class="form-select" name="action_by[{{ $act->UUID }}][]">
                                         <option value="{{ $actionByArrNRP[$i] }}">{{ $name }}</option>
                                         @foreach ($user as $uss)
                                             <option value="{{ $uss->NRP }}">{{ $uss->NAME }}</option>
@@ -38,13 +38,13 @@ $actionCount = count($actionByArr);
 
                         <button type="button"
                                 class="btn btn-success btn-sm mt-2 add-action"
-                                data-uuid="{{ $twr->UUID }}">
+                                data-uuid="{{ $act->UUID }}">
                             + Tambah Personil
                         </button>
                         <div class="modal-footer">
                             <button type="submit"
                                     class="btn btn-primary save-personil"
-                                    form="formPersonil-{{ $twr->UUID }}">
+                                    form="formPersonil-{{ $act->UUID }}">
                                 Simpan Perubahan
                             </button>
                         </div>

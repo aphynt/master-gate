@@ -3,15 +3,17 @@
 @include('layout.header')
 <style>
     #datatable {
-    table-layout: fixed;
-    width: 100%;
-}
-.wrap-text {
-    max-width: 250px;
-    white-space: normal;
-    word-wrap: break-word;
-    word-break: break-word;
-}
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .wrap-text {
+        max-width: 250px;
+        white-space: normal;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+
 </style>
 <div class="page-container">
 
@@ -48,7 +50,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body pt-2">
-                    <form id="form-tower" >
+                    <form id="form-tower">
                         <table id="datatable" class="table table-bordered dt-responsive"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
@@ -72,9 +74,10 @@
                                 @foreach ($tower as $twr)
                                 <tr style="{{ $twr->NAMA_STATUS == 'Open' ? 'background-color: #fff3cd;' : '' }}">
                                     <td>
-                                        @if (Auth::user()->nrp == $twr->NRP_REPORTING)
-                                        <input type="checkbox" name="selected_items[]" value="{{ $twr->UUID }}" style="cursor: pointer;">
-                                        @endif
+                                        {{-- @if (Auth::user()->nrp == $twr->NRP_REPORTING) --}}
+                                        <input type="checkbox" name="selected_items[]" value="{{ $twr->UUID }}"
+                                            style="cursor: pointer;">
+                                        {{-- @endif --}}
                                     </td>
                                     <td>{{ $twr->NAMA_TOWER }}</td>
                                     <td>{{ $twr->DATE_ACTION }}</td>
@@ -88,147 +91,205 @@
                                     <td>{{ $twr->REMARKS }}</td>
                                     <td>{{ $twr->REPORTING }}</td>
                                     <td>
-                                        {{-- @if (Auth::user()->nrp == $twr->NRP_REPORTING) --}}
-                                            <div class="d-flex gap-1">
-                                                <a href="#deletelistActivity{{ $twr->UUID }}"
+                                        @if (Auth::user()->nrp == $twr->NRP_REPORTING)
+                                        <div class="d-flex gap-1">
+                                            <a href="#deletelistActivity{{ $twr->UUID }}"
                                                 class="btn btn-danger btn-sm waves-effect waves-light"
-                                                data-animation="contentscale"
-                                                data-plugin="custommodal">
-                                                    Hapus
-                                                </a>
+                                                data-animation="contentscale" data-plugin="custommodal">
+                                                Hapus
+                                            </a>
 
-                                                <a href="#editPersonil{{ $twr->UUID }}"
+                                            <a href="#editPersonil{{ $twr->UUID }}"
                                                 class="btn btn-warning btn-sm waves-effect waves-light"
-                                                data-animation="blur"
-                                                data-plugin="custommodal">
-                                                    Edit Personil
-                                                </a>
-                                            </div>
-                                            @include('activityTower.modal.delete')
-                                            @include('activityTower.modal.editPersonil')
-                                        {{-- @endif --}}
+                                                data-animation="blur" data-plugin="custommodal">
+                                                Edit Personil
+                                            </a>
+                                        </div>
+                                        @include('activityTower.modal.delete')
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
+
                             </tbody>
                         </table>
                     </form>
+                    @foreach ($tower as $twr)
+                            @include('activityTower.modal.editPersonil')
+                        @endforeach
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-document.addEventListener('input', function (e) {
-    if (!e.target.classList.contains('action-count')) return;
-
-    const count = parseInt(e.target.value);
-    const uuid = e.target.dataset.uuid;
-    const container = document.getElementById('actionByContainer' + uuid);
-
-    // Ambil nama lama agar tidak hilang
-    const existingValues = Array.from(
-        container.querySelectorAll('input')
-    ).map(input => input.value);
-
-    container.innerHTML = '';
-
-    if (isNaN(count) || count < 1) return;
-
-    for (let i = 0; i < count; i++) {
-        const value = existingValues[i] ?? '';
-        container.innerHTML += `
-            <div class="mb-3">
-                <label class="form-label">Action By ${i + 1}</label>
-                <input type="text"
-                       name="action_by[${uuid}][]"
-                       class="form-control"
-                       value="${value}">
-            </div>
-        `;
-    }
-});
-</script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const dateInput = document.getElementById('basic-datepicker');
-    const params = new URLSearchParams(window.location.search);
-    const dateReport = params.get('DATE_REPORT');
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('add-action')) {
+            const uuid = e.target.dataset.uuid;
+            const container = document.getElementById('actionByContainer' + uuid);
+            const index = container.children.length + 1;
 
-    if (dateReport) {
-        dateInput.value = dateReport;
-    } else {
-        const now = new Date();
-        const makassarDate = new Intl.DateTimeFormat('en-CA', {
-            timeZone: 'Asia/Makassar',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        }).format(now);
-        dateInput.value = makassarDate;
-    }
-});
+            const row = document.createElement('div');
+            row.className = 'mb-3 d-flex align-items-center action-row';
+            row.innerHTML = `
+                <div class="flex-grow-1 me-2">
+                    <label class="form-label">Personil ${index}</label>
+                    <select class="form-select" name="action_by[${uuid}][]">
+                        <option selected>-- Pilih Personil --</option>
+                        @foreach ($user as $uss)
+                            <option value="{{ $uss->NRP }}">{{ $uss->NAME }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="button" class="btn btn-danger btn-sm remove-action mt-4">
+                    Hapus
+                </button>
+            `;
 
-document.getElementById('form-tower').addEventListener('submit', function(e) {
-    e.preventDefault();
-});
+            container.appendChild(row);
+        }
 
-document.querySelectorAll('input[name="selected_items[]"]').forEach(cb => {
-    cb.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-});
+        // ============================
+        // HAPUS PERSONIL
+        // ============================
+        if (e.target.classList.contains('remove-action')) {
+            const row = e.target.closest('.action-row');
+            const container = row.parentElement;
 
-document.querySelectorAll('#datatable tbody tr').forEach(row => {
-    row.addEventListener('click', function(e) {
-        if (e.target.type === 'checkbox') return;
+            row.remove();
 
-        const checkbox = this.querySelector('input[type="checkbox"]');
-        if (checkbox) {
-            checkbox.checked = !checkbox.checked;
+            // Re-number label
+            Array.from(container.children).forEach((el, idx) => {
+                const label = el.querySelector('label');
+                if (label) {
+                    label.textContent = 'Personil ' + (idx + 1);
+                }
+            });
         }
     });
-});
 
-document.getElementById('btn-detail-data').addEventListener('click', function() {
-    const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
+</script>
 
-    if (checkedBoxes.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Upps...',
-            text: 'Pilih minimal satu data!',
-            confirmButtonText: 'OK'
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('basic-datepicker');
+        const params = new URLSearchParams(window.location.search);
+        const dateReport = params.get('DATE_REPORT');
+
+        if (dateReport) {
+            dateInput.value = dateReport;
+        } else {
+            const now = new Date();
+            const makassarDate = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Makassar',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).format(now);
+            dateInput.value = makassarDate;
+        }
+    });
+
+    document.getElementById('form-tower').addEventListener('submit', function (e) {
+        e.preventDefault();
+    });
+
+    document.querySelectorAll('input[name="selected_items[]"]').forEach(cb => {
+        cb.addEventListener('click', function (e) {
+            e.stopPropagation();
         });
-        return;
-    }
+    });
 
-    const uuids = Array.from(checkedBoxes).map(cb => cb.value);
+    document.querySelectorAll('#datatable tbody tr').forEach(row => {
+        row.addEventListener('click', function (e) {
+            if (e.target.type === 'checkbox') return;
 
-    const url = `{{ url('activityTower/detail') }}?ids=` + uuids.join(',');
-
-    window.location.href = url;
-});
-document.getElementById('btn-edit-data').addEventListener('click', function() {
-    const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
-
-    if (checkedBoxes.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Upps...',
-            text: 'Pilih minimal satu data!',
-            confirmButtonText: 'OK'
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+            }
         });
-        return;
-    }
+    });
 
-    const uuids = Array.from(checkedBoxes).map(cb => cb.value);
+    document.getElementById('btn-detail-data').addEventListener('click', function () {
+        const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
 
-    const url = `{{ url('activityTower/edit') }}?ids=` + uuids.join(',');
+        if (checkedBoxes.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Upps...',
+                text: 'Pilih minimal satu data!',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
-    window.location.href = url;
-});
+        const uuids = Array.from(checkedBoxes).map(cb => cb.value);
+
+        const url = `{{ url('activityTower/detail') }}?ids=` + uuids.join(',');
+
+        window.location.href = url;
+    });
+    document.getElementById('btn-edit-data').addEventListener('click', function () {
+        const checkedBoxes = document.querySelectorAll('input[name="selected_items[]"]:checked');
+
+        if (checkedBoxes.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Upps...',
+                text: 'Pilih minimal satu data!',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        const uuids = Array.from(checkedBoxes).map(cb => cb.value);
+
+        const url = `{{ url('activityTower/edit') }}?ids=` + uuids.join(',');
+
+        window.location.href = url;
+    });
+    document.addEventListener('click', function (e) {
+
+        if (!e.target.classList.contains('save-personil')) return;
+
+        const formId = e.target.getAttribute('form');
+        const form = document.getElementById(formId);
+
+        if (!form) {
+            alert('Form tidak ditemukan');
+            e.preventDefault();
+            return;
+        }
+
+        const uuid = formId.replace('formPersonil-', '');
+        const container = document.getElementById('actionByContainer' + uuid);
+
+        if (!container) {
+            alert('Data personil tidak ditemukan');
+            e.preventDefault();
+            return;
+        }
+
+        const inputs = container.querySelectorAll('input, select');
+
+        if (inputs.length === 0) {
+            alert('Minimal 1 personil harus diisi');
+            e.preventDefault();
+            return;
+        }
+
+        for (const el of inputs) {
+            if (!el.value || el.value.trim() === '') {
+                alert('Masih ada personil yang kosong');
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+
 </script>
 
 @include('layout.footer')
