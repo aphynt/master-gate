@@ -25,6 +25,11 @@ class DashboardController extends Controller
         $bulanTahun = request()->filled('DATE_REPORT') ? substr(request('DATE_REPORT'), 0, 7) : Carbon::now()->format('Y-m');
         $carbonBulan = Carbon::parse($bulanTahun)->startOfMonth();
 
+        $lastMonth = Carbon::parse($bulanTahun)->subMonth();
+        $lastMonthStart = $lastMonth->copy()->startOfMonth()->toDateString();
+        $lastMonthEnd = $lastMonth->copy()->endOfMonth()->toDateString();
+        $lastMonthKey = $lastMonth->format('Y-m');
+
 
         // periode MT berdasarkan tanggal hari ini
         if ($tanggalSekarang < 16) {
@@ -134,6 +139,32 @@ class DashboardController extends Controller
         ->addBinding([$mtStart, $mtEnd, $nonMtStart, $nonMtEnd])
         ->where('rn', 1);
 
+        $latestActivityUnitLastMonth = DB::table(DB::raw("
+        (
+            SELECT
+                au.UUID_UNIT,
+                au.UUID,
+                au.DATE_ACTION,
+                au.UUID_AREA,
+                au.REMARKS,
+                au.REPORTING,
+                au.START,
+                au.ACTION_BY,
+                ROW_NUMBER() OVER (
+                    PARTITION BY au.UUID_UNIT
+                    ORDER BY au.DATE_ACTION DESC, au.UUID DESC
+                ) as rn
+            FROM ACTIVITY_UNIT au
+            JOIN LIST_ACTIVITY act ON au.UUID_ACTIVITY = act.UUID
+            WHERE
+                au.STATUSENABLED = 1
+                AND act.ID = 2
+                AND au.DATE_ACTION BETWEEN ? AND ?
+        ) as ranked
+    "))
+    ->addBinding([$lastMonthStart, $lastMonthEnd])
+    ->where('rn', 1);
+
         $maintenanceTower = DB::table('LIST_TOWER as lu')
             ->leftJoinSub($latestActivityTower, 'latest', function ($join) {
                 $join->on('lu.UUID', '=', 'latest.UUID_TOWER');
@@ -221,9 +252,6 @@ class DashboardController extends Controller
             'yesterdayMaintainedUnit' => $yesterdayMaintainedUnit,
             'yesterdayMaintainedPercentUnit' => $yesterdayMaintainedPercentUnit,
 
-            'monthlyMaintainedUnit' => $monthlyMaintainedUnit,
-            'monthlyMaintainedPercentUnit' => $monthlyMaintainedPercentUnit,
-
             'todayMaintainedTower' => $todayMaintainedTower,
             'todayMaintainedPercentTower' => $todayMaintainedPercentTower,
 
@@ -232,6 +260,15 @@ class DashboardController extends Controller
 
             'monthlyMaintainedTower' => $monthlyMaintainedTower,
             'monthlyMaintainedPercentTower' => $monthlyMaintainedPercentTower,
+
+            'monthlyMaintainedUnit' => $monthlyMaintainedUnit,
+            'monthlyMaintainedPercentUnit' => $monthlyMaintainedPercentUnit,
+
+            'lastMonthMaintainedTower' => $lastMonthMaintainedTower,
+            'lastMonthMaintainedPercentTower' => $lastMonthMaintainedPercentTower,
+
+            'lastMonthMaintainedUnit' => $lastMonthMaintainedUnit,
+            'lastMonthMaintainedPercentUnit' => $lastMonthMaintainedPercentUnit,
 
             'statusUnit' => $statusUnit,
         ];

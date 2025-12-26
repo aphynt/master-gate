@@ -1,7 +1,18 @@
 @include('layout.head', ['title' => 'Activity Tower'])
 @include('layout.sidebar')
 @include('layout.header')
-
+<style>
+    #datatable {
+    table-layout: fixed;
+    width: 100%;
+}
+.wrap-text {
+    max-width: 250px;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+</style>
 <div class="page-container">
 
     <div class="page-title-box">
@@ -38,7 +49,7 @@
             <div class="card">
                 <div class="card-body pt-2">
                     <form id="form-tower" >
-                        <table id="datatable" class="table table-bordered dt-responsive nowrap"
+                        <table id="datatable" class="table table-bordered dt-responsive"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
@@ -68,8 +79,8 @@
                                     <td>{{ $twr->NAMA_TOWER }}</td>
                                     <td>{{ $twr->DATE_ACTION }}</td>
                                     <td>{{ $twr->NAMA_ACTIVITY }}</td>
-                                    <td>{{ $twr->ACTUAL_PROBLEM }}</td>
-                                    <td>{{ $twr->ACTION_PROBLEM }}</td>
+                                    <td class="wrap-text">{{ $twr->ACTUAL_PROBLEM }}</td>
+                                    <td class="wrap-text">{{ $twr->ACTION_PROBLEM }}</td>
                                     <td>{{ date('H:i', strtotime($twr->START)) }}</td>
                                     <td>{{ date('H:i', strtotime($twr->FINISH)) }}</td>
                                     <td>{{ $twr->NAMA_STATUS }}</td>
@@ -77,13 +88,25 @@
                                     <td>{{ $twr->REMARKS }}</td>
                                     <td>{{ $twr->REPORTING }}</td>
                                     <td>
-                                        @if (Auth::user()->nrp == $twr->NRP_REPORTING)
-                                            <a href="#deletelistActivity{{ $twr->UUID }}"
-                                            class="btn btn-danger waves-effect waves-light btn-sm" data-animation="contentscale"
-                                            data-plugin="custommodal" data-overlaySpeed="100"
-                                            data-overlayColor="#36404a">Hapus</a>
+                                        {{-- @if (Auth::user()->nrp == $twr->NRP_REPORTING) --}}
+                                            <div class="d-flex gap-1">
+                                                <a href="#deletelistActivity{{ $twr->UUID }}"
+                                                class="btn btn-danger btn-sm waves-effect waves-light"
+                                                data-animation="contentscale"
+                                                data-plugin="custommodal">
+                                                    Hapus
+                                                </a>
+
+                                                <a href="#editPersonil{{ $twr->UUID }}"
+                                                class="btn btn-warning btn-sm waves-effect waves-light"
+                                                data-animation="blur"
+                                                data-plugin="custommodal">
+                                                    Edit Personil
+                                                </a>
+                                            </div>
                                             @include('activityTower.modal.delete')
-                                        @endif
+                                            @include('activityTower.modal.editPersonil')
+                                        {{-- @endif --}}
                                     </td>
                                 </tr>
                                 @endforeach
@@ -95,6 +118,37 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('action-count')) return;
+
+    const count = parseInt(e.target.value);
+    const uuid = e.target.dataset.uuid;
+    const container = document.getElementById('actionByContainer' + uuid);
+
+    // Ambil nama lama agar tidak hilang
+    const existingValues = Array.from(
+        container.querySelectorAll('input')
+    ).map(input => input.value);
+
+    container.innerHTML = '';
+
+    if (isNaN(count) || count < 1) return;
+
+    for (let i = 0; i < count; i++) {
+        const value = existingValues[i] ?? '';
+        container.innerHTML += `
+            <div class="mb-3">
+                <label class="form-label">Action By ${i + 1}</label>
+                <input type="text"
+                       name="action_by[${uuid}][]"
+                       class="form-control"
+                       value="${value}">
+            </div>
+        `;
+    }
+});
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

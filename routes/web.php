@@ -147,6 +147,7 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/activityTower', [ActivityTowerController::class, 'index'])->name('activityTower.index');
     Route::get('/activityTower/insert', [ActivityTowerController::class, 'insert'])->name('activityTower.insert');
     Route::post('/activityTower/post', [ActivityTowerController::class, 'post'])->name('activityTower.post');
+    Route::post('/activityTower/updatePersonil/{uuid}', [ActivityTowerController::class, 'updatePersonil'])->name('activityTower.updatePersonil');
     Route::post('/activityTower/update', [ActivityTowerController::class, 'update'])->name('activityTower.update');
     Route::get('/activityTower/edit', [ActivityTowerController::class, 'edit'])->name('activityTower.edit');
     Route::get('/activityTower/detail', [ActivityTowerController::class, 'detail'])->name('activityTower.detail');

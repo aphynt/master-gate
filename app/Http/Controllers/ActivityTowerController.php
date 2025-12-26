@@ -29,6 +29,8 @@ class ActivityTowerController extends Controller
             $date = Carbon::today()->format('Y-m-d');
         }
 
+        $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
+
         $users = DB::table('users')->pluck('name', 'nrp');
 
         $tower = DB::table('activity_tower as at')
@@ -67,10 +69,11 @@ class ActivityTowerController extends Controller
             }
 
             $act->ACTION_BY = implode(', ', $names);
+            $act->ACTION_BY_NRP = implode(', ', $nrps);
         }
 
 
-        return view('activityTower.index', compact('tower'));
+        return view('activityTower.index', compact('tower', 'user'));
     }
 
     public function insert()
@@ -84,6 +87,11 @@ class ActivityTowerController extends Controller
         $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         return view('activityTower.insert', compact('tower', 'user', 'activity', 'reqBy', 'actual', 'status', 'barang'));
+    }
+
+    public function updatePersonil(Request $request)
+    {
+        dd($request->all());
     }
 
     public function post(Request $request)
