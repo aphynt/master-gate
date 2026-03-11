@@ -87,7 +87,7 @@ class SummaryMonthlyAdditionalExport implements FromCollection, WithEvents, With
                 foreach ($this->additionalMonthlyActivity as $index => $item) {
                     // Zebra color: jika genap → putih, jika ganjil → abu muda
                     $fillColor = ($index % 2 == 0) ? 'FFFFFF' : 'F2F2F2';
-                    $range = "A{$row}:H{$row}";
+                    $range = "A{$row}:F{$row}";
 
                     // Isi data per kolom
                     $sheet->setCellValue("A{$row}", $index + 1);
