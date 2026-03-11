@@ -63,7 +63,7 @@ class SummaryMonthlyAdditionalExport implements FromCollection, WithEvents, With
                 $sheet = $event->sheet->getDelegate();
 
                 // Header
-                $sheet->mergeCells('A1:H1');
+                $sheet->mergeCells('A1:F1');
                 $sheet->setCellValue('A1', 'Laporan Aktivitas Additional FMS (Network) Bulan '. \Carbon\Carbon::parse($this->nonMtStart)->translatedFormat('F Y') );
                 $sheet->getStyle('A1')->getFont()->setSize(14)->setBold(true);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
