@@ -12,14 +12,16 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class SummaryMonthlyExport implements WithMultipleSheets
 {
+    protected $additionalMonthlyActivity;
     protected $towerMonthlyActivity;
     protected $unitMonthlyActivity;
     protected $nonMtStart;
     protected $nonMtEnd;
 
-    public function __construct($towerMonthlyActivity, $unitMonthlyActivity, $nonMtStart, $nonMtEnd)
+    public function __construct($additionalMonthlyActivity, $towerMonthlyActivity, $unitMonthlyActivity, $nonMtStart, $nonMtEnd)
     {
 
+        $this->additionalMonthlyActivity = $additionalMonthlyActivity;
         $this->towerMonthlyActivity = $towerMonthlyActivity;
         $this->unitMonthlyActivity = $unitMonthlyActivity;
         $this->nonMtStart = $nonMtStart;
@@ -31,6 +33,7 @@ class SummaryMonthlyExport implements WithMultipleSheets
         return [
             new SummaryMonthlyTowerExport($this->towerMonthlyActivity, $this->nonMtStart),
             new SummaryMonthlyUnitExport($this->unitMonthlyActivity, $this->nonMtStart),
+            new SummaryMonthlyAdditionalExport($this->additionalMonthlyActivity, $this->nonMtStart),
         ];
     }
 }

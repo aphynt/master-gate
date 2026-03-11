@@ -38,6 +38,30 @@ class MonthlyActivityController extends Controller
             return implode(', ', $names);
         };
 
+        $additional = DB::table('activity_additional as add')
+            ->leftJoin('list_team as team', 'add.UUID_TEAM', 'team.UUID')
+            ->leftJoin('users as us', 'add.REPORTING', 'us.nrp')
+            ->select(
+                'add.UUID',
+                'add.STATUSENABLED',
+                'team.UUID as UUID_TEAM',
+                'team.NAMA as NAMA_TEAM',
+                'add.START',
+                'add.FINISH',
+                'add.ACTION_PROBLEM',
+                'add.ACTION_BY as PIC',
+                'us.name as REPORTING',
+                'add.REPORTING as NRP_REPORTING',
+                'add.DATE_REPORT'
+            )
+            ->where('add.STATUSENABLED', true)
+            ->whereBetween('add.DATE_REPORT', [$nonMtStart, $nonMtEnd])
+            ->get()
+            ->map(function ($act) use ($convertPIC) {
+                $act->PIC = $convertPIC($act->PIC);
+                return $act;
+            });
+
         $tower = DB::table('activity_tower as at')
             ->leftJoin('LIST_TOWER as lt', 'at.UUID_TOWER', 'lt.UUID')
             ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
@@ -120,6 +144,13 @@ class MonthlyActivityController extends Controller
 
         $teamOrder = ['All Team', 'Tower', 'Unit'];
 
+        $additionalMonthlyActivity = collect()
+        ->merge($additional)
+        ->sortBy(function ($item) {
+            return \Carbon\Carbon::parse($item->DATE_REPORT);
+        })
+        ->values();
+
         $towerMonthlyActivity = collect()
         ->merge($tower)
         ->merge($genset)
@@ -157,7 +188,7 @@ class MonthlyActivityController extends Controller
         ->values();
 
         if ($action === 'export') {
-        return Excel::download(new SummaryMonthlyExport($towerMonthlyActivity, $unitMonthlyActivity, $nonMtStart, $nonMtEnd), 'Laporan IT-FMS ke GA Bulan ' . Carbon::parse($nonMtStart)->translatedFormat('F Y') .'.xlsx');
+        return Excel::download(new SummaryMonthlyExport($additionalMonthlyActivity, $towerMonthlyActivity, $unitMonthlyActivity, $nonMtStart, $nonMtEnd), 'Laporan IT-FMS ke GA Bulan ' . Carbon::parse($nonMtStart)->translatedFormat('F Y') .'.xlsx');
         }
 
         return view('monthlyActivity.index', compact('towerMonthlyActivity','unitMonthlyActivity', 'data'));
