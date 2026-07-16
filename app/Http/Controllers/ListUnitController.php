@@ -41,6 +41,7 @@ class ListUnitController extends Controller
         try {
 
             ListUnit::where('UUID', $uuid)->update([
+                'CONVERTER_DC_TO_DC' => (int) $request->CONVERTER_DC_TO_DC,
                 'STATUSENABLED' => (int) $request->STATUSENABLED,
                 'UPDATED_BY' => Auth::user()->nrp,
                 // 'UPDATED_AT' => now(),

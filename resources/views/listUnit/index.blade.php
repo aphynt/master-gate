@@ -26,8 +26,8 @@
                             <div class="card-body">
                                 <div class="responsive-table-plugin">
                                     <div class="table-rep-plugin">
-                                        <div class="table-responsive" data-pattern="priority-columns">
-                                            <table id="tech-companies-1" class="table table-striped">
+                                        <div class="dt-responsive table-responsive" >
+                                            <table id="tech-companies-1" class="table table-striped table-hover table-bordered nowrap">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -35,6 +35,7 @@
                                                         <th data-priority="1">GROUP</th>
                                                         <th data-priority="1">TYPE</th>
                                                         <th data-priority="1">IP ADDRESS</th>
+                                                        <th data-priority="1">CONVERTER DC TO DC</th>
                                                         <th data-priority="1">STATUS ENABLED</th>
                                                         <th data-priority="1">AKSI</th>
                                                     </tr>
@@ -47,6 +48,7 @@
                                                             <td>{{ $item->GROUP_ID }}</td>
                                                             <td>{{ $item->TYPE_ID }}</td>
                                                             <td>{{ $item->IP_ADDRESS }}</td>
+                                                            <td>{{ $item->CONVERTER_DC_TO_DC == true ? '✔️' : '🟡' }}</td>
                                                             <td>{{ $item->STATUSENABLED == true ? '✔️' : '❌' }}</td>
                                                             <td>
                                                                 <a href="#editlistUnit{{ $item->UUID }}" class="btn btn-purple waves-effect waves-light btn-sm" data-animation="sign" data-plugin="custommodal" data-overlaySpeed="100" data-overlayColor="#36404a">Edit</a>

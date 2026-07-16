@@ -15,6 +15,17 @@
                 </div>
             </div>
             <div class="mt-3">
+                <label for="variableForm">Converter DC to DC</label>
+                <div class="form-check">
+                    <input type="radio" id="convertDCtoDCTrue" name="CONVERTER_DC_TO_DC" class="form-check-input" value="1" {{ $item->CONVERTER_DC_TO_DC ? 'checked' : '' }}>
+                    <label class="form-check-label" for="convertDCtoDCTrue">Ada</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" id="convertDCtoDCFalse" name="CONVERTER_DC_TO_DC" class="form-check-input" value="0" {{ !$item->CONVERTER_DC_TO_DC ? 'checked' : '' }}>
+                    <label class="form-check-label" for="convertDCtoDCFalse">Belum Ada</label>
+                </div>
+            </div>
+            <div class="mt-3">
                 <label for="variableForm">Status Enabled</label>
                 <div class="form-check">
                     <input type="radio" id="statusEnabledTrue" name="STATUSENABLED" class="form-check-input" value="1" {{ $item->STATUSENABLED ? 'checked' : '' }}>
