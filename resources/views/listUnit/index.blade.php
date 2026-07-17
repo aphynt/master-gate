@@ -27,7 +27,7 @@
                                 <div class="responsive-table-plugin">
                                     <div class="table-rep-plugin">
                                         <div class="dt-responsive table-responsive" >
-                                            <table id="tech-companies-1" class="table table-striped table-hover table-bordered nowrap">
+                                            <table id="datatable" class="table table-bordered dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -69,3 +69,13 @@
                 <!-- end row -->
             </div>
 @include('layout.footer')
+
+<script>
+    $('#datatable').DataTable({
+    pageLength: 50,
+    lengthMenu: [
+        [10, 25, 50, 100, -1],
+        [10, 25, 50, 100, "All"]
+    ]
+});
+</script>
