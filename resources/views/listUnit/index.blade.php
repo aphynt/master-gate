@@ -51,13 +51,24 @@
                                                             <td>{{ $item->CONVERTER_DC_TO_DC == true ? '✔️' : '🟡' }}</td>
                                                             <td>{{ $item->STATUSENABLED == true ? '✔️' : '❌' }}</td>
                                                             <td>
-                                                                <a href="#editlistUnit{{ $item->ID }}" class="btn btn-purple waves-effect waves-light btn-sm" data-animation="sign" data-plugin="custommodal" data-overlaySpeed="100" data-overlayColor="#36404a">Edit</a>
+                                                                <button
+                                                                    type="button"
+                                                                    class="btn btn-purple btn-sm"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editModal"
+
+                                                                    data-uuid="{{ $item->UUID }}"
+                                                                    data-vhc="{{ $item->VHC_ID }}"
+                                                                    data-converter="{{ $item->CONVERTER_DC_TO_DC }}"
+                                                                    data-status="{{ $item->STATUSENABLED }}">
+                                                                    Edit
+                                                                </button>
                                                             </td>
                                                         </tr>
-                                                    @include('listUnit.modal.edit')
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                            @include('listUnit.modal.edit')
                                         </div> <!-- end .table-responsive -->
 
                                     </div> <!-- end .table-rep-plugin-->
@@ -77,5 +88,26 @@
         [10, 25, 50, 100, -1],
         [10, 25, 50, 100, "All"]
     ]
+});
+
+$('#editModal').on('show.bs.modal', function (event) {
+
+    let button = $(event.relatedTarget);
+
+    let uuid = button.data('uuid');
+    let vhc = button.data('vhc');
+    let converter = button.data('converter');
+    let status = button.data('status');
+
+    $('#vhc').val(vhc);
+
+    $('input[name="CONVERTER_DC_TO_DC"][value="' + converter + '"]')
+        .prop('checked', true);
+
+    $('input[name="STATUSENABLED"][value="' + status + '"]')
+        .prop('checked', true);
+
+    $('#editForm').attr('action', '/listUnit/update/' + uuid);
+
 });
 </script>

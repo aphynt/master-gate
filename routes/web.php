@@ -87,7 +87,7 @@ Route::group(['middleware' => ['auth']], function(){
     //List Unit
     Route::get('/listUnit', [ListUnitController::class, 'index'])->name('listUnit.index');
     Route::post('/listUnit/insert', [ListUnitController::class, 'insert'])->name('listUnit.insert');
-    Route::get('/listUnit/update/{uuid}', [ListUnitController::class, 'update'])->name('listUnit.update');
+    Route::post('/listUnit/update/{uuid}', [ListUnitController::class, 'update'])->name('listUnit.update');
 
     //Inventory
     Route::get('/inventory', [BarangController::class, 'index'])->name('barang.index');
