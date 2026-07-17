@@ -1,4 +1,4 @@
-<div id="editlistUnit{{ $item->UUID }}" class="modal-demo">
+<div id="editlistUnit{{ $item->ID }}" class="modal-demo">
     <div class="d-flex w-100 p-3 bg-primary align-items-center justify-content-between">
         <h4 class="custom-modal-title">Edit Unit</h4>
         <button type="button" class="btn-close btn-close-white" onclick="Custombox.modal.close();">

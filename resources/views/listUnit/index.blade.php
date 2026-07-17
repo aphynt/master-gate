@@ -35,7 +35,7 @@
                                                         <th data-priority="1">GROUP</th>
                                                         <th data-priority="1">TYPE</th>
                                                         <th data-priority="1">IP ADDRESS</th>
-                                                        <th data-priority="1">CONVERTER DC TO DC</th>
+                                                        <th data-priority="1">STEP DOWN DC TO DC</th>
                                                         <th data-priority="1">STATUS ENABLED</th>
                                                         <th data-priority="1">AKSI</th>
                                                     </tr>
@@ -51,7 +51,7 @@
                                                             <td>{{ $item->CONVERTER_DC_TO_DC == true ? '✔️' : '🟡' }}</td>
                                                             <td>{{ $item->STATUSENABLED == true ? '✔️' : '❌' }}</td>
                                                             <td>
-                                                                <a href="#editlistUnit{{ $item->UUID }}" class="btn btn-purple waves-effect waves-light btn-sm" data-animation="sign" data-plugin="custommodal" data-overlaySpeed="100" data-overlayColor="#36404a">Edit</a>
+                                                                <a href="#editlistUnit{{ $item->ID }}" class="btn btn-purple waves-effect waves-light btn-sm" data-animation="sign" data-plugin="custommodal" data-overlaySpeed="100" data-overlayColor="#36404a">Edit</a>
                                                             </td>
                                                         </tr>
                                                     @include('listUnit.modal.edit')
