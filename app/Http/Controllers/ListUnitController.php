@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ListUnitExport;
 use App\Models\ListUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Ramsey\Uuid\Uuid;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListUnitController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
         $listUnit = ListUnit::all();
+        $action = $request->input('action_type');
+        if ($action === 'export') {
+            return Excel::download(new ListUnitExport($listUnit), 'List Unit.xlsx');
+        }
+
         return view('listUnit.index', compact('listUnit'));
     }
 

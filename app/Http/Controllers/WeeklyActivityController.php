@@ -200,8 +200,8 @@ class WeeklyActivityController extends Controller
 
 
             if ($action === 'export') {
-            return Excel::download(new SummaryWeeklyExport($monthlyActivity, $weekly, $tanggal, $startDate, $endDateMingguDepan), 'Weekly Activity dan Plan ' . Carbon::parse($startDate)->translatedFormat('d F Y') . ' - ' . Carbon::parse($endDateMingguDepan)->translatedFormat('d F Y') .'.xlsx');
-        }
+                return Excel::download(new SummaryWeeklyExport($monthlyActivity, $weekly, $tanggal, $startDate, $endDateMingguDepan), 'Weekly Activity dan Plan ' . Carbon::parse($startDate)->translatedFormat('d F Y') . ' - ' . Carbon::parse($endDateMingguDepan)->translatedFormat('d F Y') .'.xlsx');
+            }
         return view('weeklyActivity.index', compact('data'));
     }
 }

@@ -10,10 +10,11 @@
                             <h4 class="font-18 mb-0">List Unit</h4>
                         </div>
 
-                        {{-- <div class="text-end">
-                            <a href="#insertlistUnit" class="btn btn-primary waves-effect waves-light" data-animation="sign" data-plugin="custommodal" data-overlaySpeed="100" data-overlayColor="#36404a">Tambah</a>
-                        </div>
-                        @include('listUnit.modal.insert') --}}
+                       <form action="" method="GET" class="d-flex align-items-center gap-2">
+                            <button type="submit" name="action_type" value="export" class="btn btn-primary waves-effect waves-light">
+                                Export Excel
+                            </button>
+                        </form>
                     </div>
 
 
