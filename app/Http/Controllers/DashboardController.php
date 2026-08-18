@@ -228,7 +228,7 @@ class DashboardController extends Controller
         $lastMonthMaintainedPercentUnit = $percentage($lastMonthMaintainedUnit, $totalPlanAllUnit);
         $lastMonthMaintainedPercentTower = $percentage($lastMonthMaintainedTower, $totalPlanAllTower);
 
-        $statusUnit = collect(DB::connection('focus')->select('SET NOCOUNT ON; EXEC FOCUS_REPORTING.DBO.RPT_DASHBOARD_RESUME_TOTAL_UNIT'));
+        // $statusUnit = collect(DB::connection('focus')->select('SET NOCOUNT ON; EXEC FOCUS_REPORTING.DBO.RPT_DASHBOARD_RESUME_TOTAL_UNIT'));
 
         $totalBarang = Barang::where('STATUSENABLED', true)->count();
 
@@ -271,7 +271,7 @@ class DashboardController extends Controller
             'totalBarangKeluarHarian' => $totalBarangKeluarHarian,
 
 
-            'statusUnit' => $statusUnit,
+            // 'statusUnit' => $statusUnit,
         ];
 
         return view('dashboard.index', compact('dataSummary'));

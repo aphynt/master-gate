@@ -167,7 +167,7 @@
             </div>
         </div><!-- end col-->
 
-        <div class="col-xl-5">
+        {{-- <div class="col-xl-5">
             <div class="card card-body">
 
                 <h4 class="header-title mb-3">Status Unit</h4>
@@ -234,7 +234,8 @@
                     </table>
                 </div>
             </div>
-        </div><!-- end col-->
+        </div> --}}
+        <!-- end col-->
 
     </div>
     {{-- <div class="row">
