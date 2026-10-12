@@ -147,6 +147,13 @@
                     </div>
                 </td>
                 <td>
+                    <select class="form-control" name="data[${rowIndex}][STATUS]">
+                        @foreach ($status as $sta)
+                        <option value="{{ $sta->UUID }}">{{ $sta->KETERANGAN }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
                     <textarea class="form-control form-control-sm" name="data[${rowIndex}][ACTION_PROBLEM]"></textarea>
                 </td>
                 <td>
