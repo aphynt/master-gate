@@ -39,6 +39,7 @@ class DailyActivityController extends Controller
 
         $additional = DB::table('ACTIVITY_ADDITIONAL as add')
             ->leftJoin('LIST_TEAM as team', 'add.UUID_TEAM', 'team.UUID')
+            ->leftJoin('LIST_STATUS as ls', 'add.UUID_STATUS', 'ls.UUID')
             ->leftJoin('users as us', 'add.REPORTING', 'us.nrp')
             ->select(
                 'add.UUID',
@@ -49,7 +50,8 @@ class DailyActivityController extends Controller
                 'add.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'add.DATE_REPORT',
-                'team.NAMA as TEAM'
+                'team.NAMA as TEAM',
+                'ls.KETERANGAN as NAMA_STATUS'
             )
             ->where('add.STATUSENABLED', true)
             ->where('add.DATE_REPORT', $date)
@@ -62,6 +64,7 @@ class DailyActivityController extends Controller
         // --- Ambil data Tower ---
         $tower = DB::table('activity_tower as at')
             ->leftJoin('LIST_TOWER as lt', 'at.UUID_TOWER', 'lt.UUID')
+            ->leftJoin('LIST_STATUS as ls', 'at.UUID_STATUS', 'ls.UUID')
             ->leftJoin('users as us', 'at.REPORTING', 'us.nrp')
             ->select(
                 'at.UUID',
@@ -82,7 +85,8 @@ class DailyActivityController extends Controller
                 'at.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'at.DATE_ACTION as DATE_REPORT',
-                DB::raw("'Tower' as TEAM")
+                DB::raw("'Tower' as TEAM"),
+                'ls.KETERANGAN as NAMA_STATUS'
             )
             ->where('at.STATUSENABLED', true)
             ->where('at.DATE_ACTION', $date)
@@ -95,6 +99,7 @@ class DailyActivityController extends Controller
         // --- Ambil data Unit ---
         $unit = DB::table('ACTIVITY_UNIT as un')
             ->leftJoin('LIST_UNIT as lu', 'un.UUID_UNIT', 'lu.UUID')
+            ->leftJoin('LIST_STATUS as ls', 'un.UUID_STATUS', 'ls.UUID')
             ->leftJoin('users as us', 'un.REPORTING', 'us.nrp')
             ->select(
                 'un.UUID',
@@ -115,7 +120,8 @@ class DailyActivityController extends Controller
                 'un.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'un.DATE_ACTION as DATE_REPORT',
-                DB::raw("'Unit' as TEAM")
+                DB::raw("'Unit' as TEAM"),
+                'ls.KETERANGAN as NAMA_STATUS'
             )
             ->where('un.STATUSENABLED', true)
             ->where('un.DATE_ACTION', $date)
@@ -138,7 +144,8 @@ class DailyActivityController extends Controller
                 'gen.ACTION_BY as PIC',
                 'us.name as REPORTING',
                 'gen.DATE_REPORT',
-                DB::raw("'Tower' as TEAM")
+                DB::raw("'Tower' as TEAM"),
+                DB::raw("'Genset' as NAMA_STATUS"),
             )
             ->where('gen.STATUSENABLED', true)
             ->where('gen.DATE_REPORT', $date)

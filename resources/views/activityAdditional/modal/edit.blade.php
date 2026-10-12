@@ -41,6 +41,17 @@
             </div>
             <div class="mt-3">
                 <div class="form-group">
+                    <label for="variableForm">STATUS</label>
+                    <select class="form-control" name="STATUS" required>
+                                <option value="{{ $act->UUID_STATUS }}">{{ $act->NAMA_STATUS }}</option>
+                                @foreach ($status as $te)
+                                <option value="{{ $te->UUID }}">{{ $te->KETERANGAN }}</option>
+                                @endforeach
+                            </select>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="form-group">
                     <label for="variableForm">ACTIVITY</label>
                     <textarea class="form-control" id="variableForm" style="min-height: 200px" name="ACTION_PROBLEM"
                         required>{{ $act->ACTION_PROBLEM }}</textarea>

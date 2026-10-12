@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exports;
 
 use Illuminate\Contracts\Support\Responsable;
@@ -11,6 +12,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use Carbon\Carbon;
 
 class DailyActivityExport implements FromCollection, WithEvents, WithStyles, WithDrawings, Responsable, WithTitle
@@ -31,6 +33,7 @@ class DailyActivityExport implements FromCollection, WithEvents, WithStyles, Wit
     {
         return collect([]);
     }
+
     public function title(): string
     {
         return 'Daily Activity';
@@ -46,6 +49,7 @@ class DailyActivityExport implements FromCollection, WithEvents, WithStyles, Wit
         $drawing->setCoordinates('A1');
         $drawing->setOffsetX(10);
         $drawing->setOffsetY(10);
+
         return [$drawing];
     }
 
@@ -61,85 +65,118 @@ class DailyActivityExport implements FromCollection, WithEvents, WithStyles, Wit
                 $sheet = $event->sheet->getDelegate();
                 $dateFormatted = Carbon::parse($this->date)->translatedFormat('d F Y');
 
-                $sheet->mergeCells('A1:G1');
+                $sheet->mergeCells('A1:H1');
                 $sheet->setCellValue('A1', 'Daily Activity');
                 $sheet->getStyle('A1')->getFont()->setSize(14)->setBold(true);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
-                $sheet->mergeCells('A2:G2');
+                $sheet->mergeCells('A2:H2');
                 $sheet->setCellValue('A2', 'Tanggal: ' . $dateFormatted);
                 $sheet->getStyle('A2')->getFont()->setSize(12);
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
-                $sheet->mergeCells('A3:G3');
+                $sheet->mergeCells('A3:H3');
                 $sheet->setCellValue('A3', 'Departemen: GA - IT');
                 $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(10);
 
-                // ===== Header Tabel =====
                 $startRow = 5;
+
                 $sheet->setCellValue("A{$startRow}", 'No');
                 $sheet->setCellValue("B{$startRow}", 'Team');
                 $sheet->setCellValue("C{$startRow}", 'Jam Action');
                 $sheet->setCellValue("D{$startRow}", 'Jam Finish');
-                $sheet->setCellValue("E{$startRow}", 'Activity');
-                $sheet->setCellValue("F{$startRow}", 'On-site');
-                $sheet->setCellValue("G{$startRow}", 'Reporting');
+                $sheet->setCellValue("E{$startRow}", 'Status');
+                $sheet->setCellValue("F{$startRow}", 'Activity');
+                $sheet->setCellValue("G{$startRow}", 'On-site');
+                $sheet->setCellValue("H{$startRow}", 'Reporting');
 
-                $sheet->getStyle("A{$startRow}:G{$startRow}")->getFont()->setBold(true);
-                $sheet->getStyle("A{$startRow}:G{$startRow}")->getAlignment()->setHorizontal('center');
-                $sheet->getStyle("A{$startRow}:G{$startRow}")->getFill()
+                $sheet->getStyle("A{$startRow}:H{$startRow}")
+                    ->getFont()
+                    ->setBold(true);
+
+                $sheet->getStyle("A{$startRow}:H{$startRow}")
+                    ->getAlignment()
+                    ->setHorizontal('center');
+
+                $sheet->getStyle("A{$startRow}:H{$startRow}")
+                    ->getFill()
                     ->setFillType('solid')
-                    ->getStartColor()->setRGB('D9E1F2');
+                    ->getStartColor()
+                    ->setRGB('D9E1F2');
 
                 $row = $startRow + 1;
                 $no = 1;
+
                 $grouped = $this->dailyActivity->groupBy('TEAM');
                 $yellowColor = 'FFFACD';
                 $highlightTime = Carbon::parse('16:30');
 
                 foreach ($grouped as $team => $activities) {
                     $teamStartRow = $row;
+
                     foreach ($activities as $daily) {
                         $sheet->setCellValue("A{$row}", $no++);
-
                         $sheet->setCellValue("B{$row}", $team);
+
                         $startTime = Carbon::parse($daily->START);
                         $finishTime = Carbon::parse($daily->FINISH);
 
                         $sheet->setCellValue("C{$row}", $startTime->format('H:i'));
                         $sheet->setCellValue("D{$row}", $finishTime->format('H:i'));
-                        $sheet->setCellValue("E{$row}", $daily->ACTIVITY);
-                        $sheet->setCellValue("F{$row}", $daily->PIC);
-                        $sheet->setCellValue("G{$row}", $daily->REPORTING);
+                        $sheet->setCellValue("E{$row}", $daily->NAMA_STATUS ?? '');
+                        $sheet->setCellValue("F{$row}", $daily->ACTIVITY);
+                        $sheet->setCellValue("G{$row}", $daily->PIC);
+                        $sheet->setCellValue("H{$row}", $daily->REPORTING);
 
                         if ($finishTime->gt($highlightTime)) {
-                            $sheet->getStyle("A{$row}:G{$row}")->getFill()
+                            $sheet->getStyle("A{$row}:H{$row}")
+                                ->getFill()
                                 ->setFillType('solid')
-                                ->getStartColor()->setRGB($yellowColor);
+                                ->getStartColor()
+                                ->setRGB($yellowColor);
                         }
-                        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal('center');
+
+                        $sheet->getStyle("A{$row}")
+                            ->getAlignment()
+                            ->setHorizontal('center');
+
+                        $sheet->getStyle("C{$row}:E{$row}")
+                            ->getAlignment()
+                            ->setHorizontal('center');
 
                         $row++;
                     }
 
-                    // Merge kolom Team
                     if ($teamStartRow !== ($row - 1)) {
                         $sheet->mergeCells("B{$teamStartRow}:B" . ($row - 1));
-                        $sheet->getStyle("B{$teamStartRow}:B" . ($row - 1))->getAlignment()->setVertical('center');
+
+                        $sheet->getStyle("B{$teamStartRow}:B" . ($row - 1))
+                            ->getAlignment()
+                            ->setVertical('center');
                     }
                 }
 
                 $lastRow = $row - 1;
 
-                $sheet->mergeCells("A" . ($lastRow + 2) . ":G" . ($lastRow + 2));
-                $sheet->setCellValue("A" . ($lastRow + 2), 'Keterangan: Warna kuning pekerjaan di atas jam 16.30');
-                $sheet->getStyle("A" . ($lastRow + 2))->getFont()->setItalic(true);
+                $sheet->mergeCells(
+                    "A" . ($lastRow + 2) . ":H" . ($lastRow + 2)
+                );
 
-                $sheet->getStyle("A{$startRow}:G{$lastRow}")
-                    ->getBorders()->getAllBorders()
-                    ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $sheet->setCellValue(
+                    "A" . ($lastRow + 2),
+                    'Keterangan: Warna kuning pekerjaan di atas jam 16.30'
+                );
 
-                foreach (range('A', 'G') as $col) {
+                $sheet->getStyle("A" . ($lastRow + 2))
+                    ->getFont()
+                    ->setItalic(true);
+
+                $sheet->getStyle("A{$startRow}:H{$lastRow}")
+                    ->getBorders()
+                    ->getAllBorders()
+                    ->setBorderStyle(Border::BORDER_THIN);
+
+                foreach (range('A', 'H') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
             },

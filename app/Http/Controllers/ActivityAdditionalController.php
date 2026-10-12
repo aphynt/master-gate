@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use App\Models\ListStatus;
 
 class ActivityAdditionalController extends Controller
 {
@@ -27,9 +28,11 @@ class ActivityAdditionalController extends Controller
         $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->get();
 
         $team = ListTeam::where('STATUSENABLED', true)->get();
+        $status = ListStatus::where('STATUSENABLED', true)->get();
 
         $activity = DB::table('activity_additional as add')
             ->leftJoin('list_team as team', 'add.UUID_TEAM', 'team.UUID')
+            ->leftJoin('list_status as ls', 'add.UUID_STATUS', 'ls.UUID')
             ->leftJoin('users as us', 'add.REPORTING', 'us.nrp')
             ->select(
                 'add.UUID',
@@ -38,6 +41,8 @@ class ActivityAdditionalController extends Controller
                 'team.NAMA as NAMA_TEAM',
                 'add.START',
                 'add.FINISH',
+                'ls.KETERANGAN as NAMA_STATUS',
+                'ls.UUID as UUID_STATUS',
                 'add.ACTION_PROBLEM',
                 'add.ACTION_BY',
                 'us.name as REPORTING',
@@ -64,7 +69,7 @@ class ActivityAdditionalController extends Controller
             $act->ACTION_BY_NRP = implode(', ', $nrps);
         }
 
-        return view('activityAdditional.index', compact('activity', 'team', 'user'));
+        return view('activityAdditional.index', compact('activity', 'team', 'user', 'status'));
     }
 
     public function updatePersonil(Request $request, $uuidTower)
@@ -100,9 +105,10 @@ class ActivityAdditionalController extends Controller
     public function insert()
     {
         $team = ListTeam::where('STATUSENABLED', true)->get();
+        $status = ListStatus::where('STATUSENABLED', true)->get();
         $user = User::select('UUID', 'name as NAME', 'nama_panggilan as NAMA_PANGGILAN', 'NRP')->where('STATUSENABLED', true)->where('role', '!=', 'ADMIN')->orderByDesc('nama_panggilan')->get();
 
-        return view('activityAdditional.insert', compact('team', 'user'));
+        return view('activityAdditional.insert', compact('team', 'user', 'status'));
     }
 
     public function post(Request $request)
@@ -135,6 +141,7 @@ class ActivityAdditionalController extends Controller
                     'UUID_TEAM'      => $row['TEAM'],
                     'START'          => normalizeTime($row['START']),
                     'FINISH'         => normalizeTime($row['FINISH']),
+                    'UUID_STATUS'      => $row['STATUS'],
                     'ACTION_PROBLEM' => $row['ACTION_PROBLEM'],
                     'ACTION_BY'      => $actionByString,
                     'REPORTING' => Auth::user()->nrp,
@@ -160,6 +167,7 @@ class ActivityAdditionalController extends Controller
                 'UUID_TEAM' => $request->TEAM,
                 'START'          => normalizeTime($request->START),
                 'FINISH'         => normalizeTime($request->FINISH),
+                'UUID_STATUS' => $request->STATUS,
                 'ACTION_PROBLEM' => $request->ACTION_PROBLEM,
                 // 'UPDATED_AT' => now(),
             ]);

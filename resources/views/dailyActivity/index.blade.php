@@ -45,6 +45,7 @@
                                     <th>Team</th>
                                     <th>Jam Action</th>
                                     <th>Jam Finish</th>
+                                    <th>Status</th>
                                     <th>Activity</th>
                                     <th>On-site</th>
                                     <th>Reporting</th>
@@ -61,6 +62,7 @@
                                             <td>{{ $daily->TEAM }}</td>
                                             <td>{{ \Carbon\Carbon::parse($daily->START)->format('H:i') }}</td>
                                             <td>{{ \Carbon\Carbon::parse($daily->FINISH)->format('H:i') }}</td>
+                                            <td>{{ $daily->NAMA_STATUS }}</td>
                                             <td>{{ $daily->ACTIVITY }}</td>
                                             <td>{{ $daily->PIC }}</td>
                                             <td>{{ $daily->REPORTING }}</td>

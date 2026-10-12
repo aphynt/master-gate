@@ -40,6 +40,7 @@
                                                     <th style="width: 200px; white-space: nowrap;">TEAM</th>
                                                     <th style="width: 130px; white-space: nowrap;">START</th>
                                                     <th style="width: 130px; white-space: nowrap;">FINISH</th>
+                                                    <th style="width: 130px; white-space: nowrap;">STATUS</th>
                                                     <th style="min-width: 300px; white-space: nowrap;">ACTIVITY</th>
                                                     <th style="width: 300px; white-space: nowrap;">PERSONIL</th>
                                                     <th style="width: 100px; white-space: nowrap;">AKSI</th>
@@ -67,6 +68,14 @@
                                                             <span class="input-group-text"><i class="mdi mdi-clock-outline"></i></span>
                                                         </div>
                                                     </td>
+                                                    <td>
+                                                    <select class="form-control" data-toggle="select2"
+                                                        name="data[0][STATUS]" required>
+                                                        @foreach ($status as $sta)
+                                                        <option value="{{ $sta->UUID }}">{{ $sta->KETERANGAN }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
                                                     <td><textarea class="form-control form-control-sm" style="min-width: 300px;" name="data[0][ACTION_PROBLEM]" ></textarea>
                                                     </td>
                                                     <td>
