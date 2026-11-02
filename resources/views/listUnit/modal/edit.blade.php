@@ -28,7 +28,7 @@
                             readonly>
                     </div>
 
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
 
                         <label>Converter DC to DC</label>
 
@@ -62,7 +62,7 @@
 
                         </div>
 
-                    </div>
+                    </div> --}}
 
                     <div class="mb-3">
 
