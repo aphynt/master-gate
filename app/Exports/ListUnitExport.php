@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exports;
 
 use Illuminate\Contracts\Support\Responsable;
@@ -11,9 +12,16 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDrawings, Responsable, WithTitle
+class ListUnitExport implements
+    FromCollection,
+    WithEvents,
+    WithStyles,
+    WithDrawings,
+    Responsable,
+    WithTitle
 {
     use \Maatwebsite\Excel\Concerns\Exportable;
 
@@ -28,6 +36,7 @@ class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDraw
     {
         return collect([]);
     }
+
     public function title(): string
     {
         return 'List Unit';
@@ -36,6 +45,7 @@ class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDraw
     public function drawings()
     {
         $drawing = new Drawing();
+
         $drawing->setName('Logo');
         $drawing->setDescription('Company Logo');
         $drawing->setPath(public_path('dashboard/assets/images/sims.png'));
@@ -43,6 +53,7 @@ class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDraw
         $drawing->setCoordinates('A1');
         $drawing->setOffsetX(10);
         $drawing->setOffsetY(10);
+
         return [$drawing];
     }
 
@@ -58,13 +69,18 @@ class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDraw
 
                 $sheet = $event->sheet->getDelegate();
 
-                // ===== Judul =====
-                $sheet->mergeCells('A1:G1');
+                $sheet->mergeCells('A1:J1');
                 $sheet->setCellValue('A1', 'LIST UNIT');
-                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-                $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
-                // ===== Header =====
+                $sheet->getStyle('A1')->getFont()
+                    ->setBold(true)
+                    ->setSize(16);
+
+                $sheet->getStyle('A1')->getAlignment()
+                    ->setHorizontal('center')
+                    ->setVertical('center');
+
+                $sheet->getRowDimension(1)->setRowHeight(40);
                 $headerRow = 3;
 
                 $headers = [
@@ -73,49 +89,67 @@ class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDraw
                     'C' => 'GROUP',
                     'D' => 'TYPE',
                     'E' => 'IP ADDRESS',
-                    'F' => 'STEP DOWN DC TO DC',
-                    'G' => 'STATUS ENABLED',
+                    'F' => 'STATUS CONVERTER',
+                    'G' => 'TANGGAL PEMASANGAN',
+                    'H' => 'JUMLAH RIWAYAT',
+                    'I' => 'STATUS ENABLED',
                 ];
 
                 foreach ($headers as $col => $text) {
-                    $sheet->setCellValue($col.$headerRow, $text);
+                    $sheet->setCellValue($col . $headerRow, $text);
                 }
 
-                $sheet->getStyle("A{$headerRow}:G{$headerRow}")
-                    ->getFont()->setBold(true);
+                $sheet->getStyle("A{$headerRow}:I{$headerRow}")
+                    ->getFont()
+                    ->setBold(true);
 
-                $sheet->getStyle("A{$headerRow}:G{$headerRow}")
+                $sheet->getStyle("A{$headerRow}:I{$headerRow}")
                     ->getAlignment()
                     ->setHorizontal('center')
-                    ->setVertical('center');
+                    ->setVertical('center')
+                    ->setWrapText(true);
 
-                $sheet->getStyle("A{$headerRow}:G{$headerRow}")
+                $sheet->getStyle("A{$headerRow}:I{$headerRow}")
                     ->getFill()
-                    ->setFillType(
-                        \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
-                    )
+                    ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()
                     ->setRGB('D9EAF7');
 
-                // ===== Isi Data =====
+                $sheet->getRowDimension($headerRow)->setRowHeight(30);
+
                 $row = $headerRow + 1;
                 $no = 1;
 
                 foreach ($this->listUnit as $unit) {
 
                     $sheet->setCellValue("A{$row}", $no++);
-                    $sheet->setCellValue("B{$row}", $unit->VHC_ID);
+
+                    $sheet->setCellValue("B{$row}", $unit->VHC_ID ?? '');
                     $sheet->setCellValue("C{$row}", $unit->GROUP_ID ?? '');
                     $sheet->setCellValue("D{$row}", $unit->TYPE_ID ?? '');
                     $sheet->setCellValue("E{$row}", $unit->IP_ADDRESS ?? '');
 
                     $sheet->setCellValue(
                         "F{$row}",
-                        $unit->CONVERTER_DC_TO_DC ? 'YES' : 'NO'
+                        $unit->STATUS_CONVERTER_OTOMATIS == 1
+                            ? 'TERPASANG'
+                            : 'BELUM TERPASANG'
                     );
 
                     $sheet->setCellValue(
                         "G{$row}",
+                        $unit->TANGGAL_PEMASANGAN
+                            ? \Carbon\Carbon::parse($unit->TANGGAL_PEMASANGAN)->format('d-m-Y H:i')
+                            : '-'
+                    );
+
+                    $sheet->setCellValue(
+                        "H{$row}",
+                        $unit->JUMLAH_RIWAYAT ?? 0
+                    );
+
+                    $sheet->setCellValue(
+                        "I{$row}",
                         $unit->STATUSENABLED ? 'ENABLED' : 'DISABLED'
                     );
 
@@ -124,32 +158,31 @@ class ListUnitExport implements FromCollection, WithEvents, WithStyles, WithDraw
 
                 $lastRow = $row - 1;
 
-                // Border
-                $sheet->getStyle("A{$headerRow}:G{$lastRow}")
-                    ->getBorders()
-                    ->getAllBorders()
-                    ->setBorderStyle(
-                        \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
-                    );
+                if ($lastRow >= $headerRow) {
 
-                // Auto Filter
-                $sheet->setAutoFilter("A{$headerRow}:G{$lastRow}");
+                    $sheet->getStyle("A{$headerRow}:I{$lastRow}")
+                        ->getBorders()
+                        ->getAllBorders()
+                        ->setBorderStyle(Border::BORDER_THIN);
 
-                // Freeze Header
+                    $sheet->setAutoFilter("A{$headerRow}:I{$lastRow}");
+                }
+
                 $sheet->freezePane('A4');
 
-                // Auto Width
-                foreach (range('A', 'G') as $col) {
+                foreach (range('A', 'I') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
 
-                // Tengah untuk kolom tertentu
                 $sheet->getStyle("A4:A{$lastRow}")
-                    ->getAlignment()->setHorizontal('center');
+                    ->getAlignment()
+                    ->setHorizontal('center');
 
-                $sheet->getStyle("F4:G{$lastRow}")
-                    ->getAlignment()->setHorizontal('center');
-            }
+                $sheet->getStyle("F4:I{$lastRow}")
+                    ->getAlignment()
+                    ->setHorizontal('center');
+
+            },
         ];
     }
 }
