@@ -13,23 +13,24 @@ use Maatwebsite\Excel\Facades\Excel;
 class ListUnitController extends Controller
 {
     //
+
     public function index(Request $request)
     {
         $uuidConverter = DB::table('LOG_BARANG')
-        ->where('ID', 99)
-        ->value('UUID');
+            ->where('ID', 99)
+            ->value('UUID');
 
         $riwayatConverter = DB::table('log_barang_keluar as bk')
-        ->join('ACTIVITY_UNIT as au', 'bk.UUID_ACTIVITY_UNIT', '=', 'au.UUID')
-        ->where('bk.UUID_BARANG', $uuidConverter)
-        ->where('bk.STATUSENABLED', true)
-        ->whereNotNull('au.UUID_UNIT')
-        ->select(
-            'au.UUID_UNIT',
-            DB::raw('MAX(bk.TANGGAL_KELUAR) as TANGGAL_PEMASANGAN'),
-            DB::raw('COUNT(bk.UUID) as JUMLAH_RIWAYAT')
-        )
-        ->groupBy('au.UUID_UNIT');
+            ->join('ACTIVITY_UNIT as au', 'bk.UUID_ACTIVITY_UNIT', '=', 'au.UUID')
+            ->where('bk.UUID_BARANG', $uuidConverter)
+            ->where('bk.STATUSENABLED', true)
+            ->whereNotNull('au.UUID_UNIT')
+            ->select(
+                'au.UUID_UNIT',
+                DB::raw('MAX(bk.TANGGAL_KELUAR) as TANGGAL_PEMASANGAN'),
+                DB::raw('COUNT(bk.UUID) as JUMLAH_RIWAYAT')
+            )
+            ->groupBy('au.UUID_UNIT');
 
         $listUnit = DB::table('LIST_UNIT as lu')
             ->leftJoinSub($riwayatConverter, 'converter', function ($join) {
@@ -44,23 +45,73 @@ class ListUnitController extends Controller
             ->selectRaw(
                 'CASE WHEN converter.UUID_UNIT IS NOT NULL THEN 1 ELSE 0 END AS STATUS_CONVERTER_OTOMATIS'
             )
+            ->orderByRaw("
+                CASE
+                    WHEN lu.VHC_ID LIKE 'HD%' THEN 0
+                    ELSE 1
+                END ASC
+            ")
+            ->orderBy('lu.VHC_ID', 'asc')
             ->get();
 
         $totalUnit = $listUnit->count();
 
-        $totalTerpasang = $listUnit->where('STATUS_CONVERTER_OTOMATIS', 1)->count();
+        $totalTerpasang = $listUnit
+            ->where('STATUS_CONVERTER_OTOMATIS', 1)
+            ->count();
 
         $totalBelumTerpasang = $totalUnit - $totalTerpasang;
 
-        $totalAdaRiwayat = $listUnit->whereNotNull('TANGGAL_PEMASANGAN')->count();
+        $totalAdaRiwayat = $listUnit
+            ->whereNotNull('TANGGAL_PEMASANGAN')
+            ->count();
 
         $totalAktif = $totalUnit;
-
         $totalNonaktif = 0;
 
         $persentaseTerpasang = $totalUnit > 0
             ? round(($totalTerpasang / $totalUnit) * 100, 1)
             : 0;
+
+        $rekapConverterPerType = $listUnit
+        ->groupBy(function ($item) {
+            return $item->TYPE_ID ?: 'TIDAK DIKETAHUI';
+        })
+        ->map(function ($units, $type) {
+            $jumlahUnit = $units->count();
+
+            $terpasang = $units
+                ->where('STATUS_CONVERTER_OTOMATIS', 1)
+                ->count();
+
+            $belumTerpasang = $jumlahUnit - $terpasang;
+
+            $prioritas = $units->contains(function ($unit) {
+                return str_starts_with(
+                    strtoupper($unit->VHC_ID ?? ''),
+                    'HD'
+                );
+            }) ? 0 : 1;
+
+            return (object) [
+                'TYPE_ID' => $type,
+                'TOTAL_UNIT' => $jumlahUnit,
+                'TERPASANG' => $terpasang,
+                'BELUM_TERPASANG' => $belumTerpasang,
+                'PERSENTASE' => $jumlahUnit > 0
+                    ? round(($terpasang / $jumlahUnit) * 100, 1)
+                    : 0,
+                'PRIORITAS' => $prioritas
+            ];
+        })
+        ->sortBy(function ($item) {
+            return sprintf(
+                '%d_%s',
+                $item->PRIORITAS,
+                $item->TYPE_ID
+            );
+        })
+        ->values();
 
         $action = $request->input('action_type');
 
@@ -79,9 +130,11 @@ class ListUnitController extends Controller
             'totalAdaRiwayat',
             'totalAktif',
             'totalNonaktif',
-            'persentaseTerpasang'
+            'persentaseTerpasang',
+            'rekapConverterPerType'
         ));
     }
+
 
     public function insert(Request $request)
     {

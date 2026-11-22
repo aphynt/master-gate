@@ -3,8 +3,11 @@
 @include('layout.header')
 <style>
     .text-muted {
-    color: #000000 !important;
-}
+        color: #000000 !important;
+    }
+    .badge {
+        font-size: 1em;
+    }
 </style>
 <div class="page-container">
 
@@ -120,7 +123,102 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-chart-pie me-2 text-primary"></i>
+                                        Rekap Converter Berdasarkan Type Unit
+                                    </h5>
+                                    <span class="badge bg-primary">
+                                        {{ $rekapConverterPerType->count() }} Type
+                                    </span>
+                                </div>
 
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="text-center">No</th>
+                                                <th>Type Unit</th>
+                                                <th class="text-center">Total Unit</th>
+                                                <th class="text-center">Terpasang</th>
+                                                <th class="text-center">Belum Terpasang</th>
+                                                <th style="min-width: 180px;">Progress Pemasangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($rekapConverterPerType as $type)
+                                                <tr>
+                                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                                    <td>
+                                                        <strong>{{ $type->TYPE_ID }}</strong>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{ number_format($type->TOTAL_UNIT) }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-success">
+                                                            {{ number_format($type->TERPASANG) }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-warning text-dark">
+                                                            {{ number_format($type->BELUM_TERPASANG) }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small>{{ $type->PERSENTASE }}%</small>
+                                                            <small class="text-muted">
+                                                                {{ $type->TERPASANG }}/{{ $type->TOTAL_UNIT }}
+                                                            </small>
+                                                        </div>
+                                                        <div class="progress" style="height: 10px;">
+                                                            <div
+                                                                class="progress-bar bg-success"
+                                                                role="progressbar"
+                                                                style="width: {{ $type->PERSENTASE }}%;"
+                                                                aria-valuenow="{{ $type->PERSENTASE }}"
+                                                                aria-valuemin="0"
+                                                                aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        Tidak ada data unit.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr>
+                                                <th colspan="2">TOTAL</th>
+                                                <th class="text-center">
+                                                    {{ number_format($totalUnit) }}
+                                                </th>
+                                                <th class="text-center text-success">
+                                                    {{ number_format($totalTerpasang) }}
+                                                </th>
+                                                <th class="text-center text-warning">
+                                                    {{ number_format($totalBelumTerpasang) }}
+                                                </th>
+                                                <th>
+                                                    {{ $persentaseTerpasang }}%
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
